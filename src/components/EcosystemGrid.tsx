@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { EcosystemItem } from '../types';
+import React, { useState } from "react";
+import { EcosystemItem } from "../types";
 import {
   TrendingUp,
   Repeat,
@@ -8,115 +8,112 @@ import {
   Search,
   GraduationCap,
   ArrowUpRight,
-  Shield,
-  Zap,
   CheckCircle2,
-  Lock,
   Layers,
-} from 'lucide-react';
+} from "lucide-react";
 
 const ECOSYSTEM_ITEMS: EcosystemItem[] = [
   {
-    id: 'cex',
-    name: 'Mind CEX',
-    category: 'Centralized Exchange',
-    tagline: 'Institutional Grade Matching Engine with Zero Gas Deposits',
+    id: "cex",
+    name: "Mind CEX",
+    category: "Centralized Exchange",
+    tagline: "Institutional Grade Matching Engine with Zero Gas Deposits",
     description:
-      'High-frequency spot and derivatives exchange powered by an in-memory order book capable of handling 2.5 million transactions per second with microsecond latency.',
+      "High-frequency spot and derivatives exchange powered by an in-memory order book capable of handling 2.5 million transactions per second with microsecond latency.",
     features: [
-      'Sub-millisecond trade execution',
-      'Zero maker fees for MIND holders',
-      'Proof-of-Reserves with Merkle tree verification',
-      'Instant fiat on/off ramps (Credit Card, SEPA, Wire)',
+      "Sub-millisecond trade execution",
+      "Zero maker fees for MIND holders",
+      "Proof-of-Reserves with Merkle tree verification",
+      "Instant fiat on/off ramps (Credit Card, SEPA, Wire)",
     ],
-    stats: '$48.2M 24h Volume',
-    badge: 'Flagship Core',
-    status: 'Live',
+    stats: "$48.2M 24h Volume",
+    badge: "Flagship Core",
+    status: "Live",
   },
   {
-    id: 'dex',
-    name: 'Mind DEX & AMM',
-    category: 'Decentralized Exchange',
-    tagline: 'Multi-Hop Concentrated Liquidity Swaps with Lowest Slippage',
+    id: "dex",
+    name: "Mind DEX & AMM",
+    category: "Decentralized Exchange",
+    tagline: "Multi-Hop Concentrated Liquidity Swaps with Lowest Slippage",
     description:
-      'Next-generation non-custodial automated market maker built natively on MindChain L1. Swap any EVM-wrapped asset instantly at sub-cent network gas fees.',
+      "Next-generation non-custodial automated market maker built natively on MindChain L1. Swap any EVM-wrapped asset instantly at sub-cent network gas fees.",
     features: [
-      'Concentrated liquidity yield farms (up to 42% APY)',
-      'Sub-second atomic swap routing',
-      'MEV-resistant ordering architecture',
-      'Automated portfolio rebalancing vaults',
+      "Concentrated liquidity yield farms (up to 42% APY)",
+      "Sub-second atomic swap routing",
+      "MEV-resistant ordering architecture",
+      "Automated portfolio rebalancing vaults",
     ],
-    stats: '$14.6M Total Value Locked',
-    badge: 'High Yield',
-    status: 'Live',
+    stats: "$14.6M Total Value Locked",
+    badge: "High Yield",
+    status: "Live",
   },
   {
-    id: 'defi',
-    name: 'Mind DeFi Suite & Lending',
-    category: 'Decentralized Finance',
-    tagline: 'Autonomous Money Markets, Liquid Staking & Yield Vaults',
+    id: "defi",
+    name: "Mind DeFi Suite & Lending",
+    category: "Decentralized Finance",
+    tagline: "Autonomous Money Markets, Liquid Staking & Yield Vaults",
     description:
-      'Decentralized collateralized lending and borrowing protocol. Deposit MIND, USDT, ETH, or BTC to earn passive supply interest or borrow against crypto collateral.',
+      "Decentralized collateralized lending and borrowing protocol. Deposit MIND, USDT, ETH, or BTC to earn passive supply interest or borrow against crypto collateral.",
     features: [
-      'Over-collateralized loans with dynamic interest rates',
-      'MindLiquid (stMIND) liquid staking derivative',
-      'Flash loan infrastructure with 0.05% fee',
-      'Automated liquidation safeguard bots',
+      "Over-collateralized loans with dynamic interest rates",
+      "MindLiquid (stMIND) liquid staking derivative",
+      "Flash loan infrastructure with 0.05% fee",
+      "Automated liquidation safeguard bots",
     ],
-    stats: '$9.2M Active Borrows',
-    badge: 'Audited',
-    status: 'Live',
+    stats: "$9.2M Active Borrows",
+    badge: "Audited",
+    status: "Live",
   },
   {
-    id: 'wallet',
-    name: 'Mind Web3 Wallet',
-    category: 'Self-Custodial Wallet',
-    tagline: 'Biometric Smart Contract Wallet with Gasless Transaction Relays',
+    id: "wallet",
+    name: "Mind Web3 Wallet",
+    category: "Self-Custodial Wallet",
+    tagline: "Biometric Smart Contract Wallet with Gasless Transaction Relays",
     description:
-      'The unified gateway to MindChain and all EVM chains. Enjoy account abstraction (ERC-4337), social recovery, session keys, and built-in cross-chain bridge.',
+      "The unified gateway to MindChain and all EVM chains. Enjoy account abstraction (ERC-4337), social recovery, session keys, and built-in cross-chain bridge.",
     features: [
-      'Available as iOS, Android, and Chrome Extension',
-      'Account Abstraction: Pay gas with any stablecoin',
-      'Biometric FaceID / Passkey authorization',
-      'Phishing protection and smart contract scanner',
+      "Available as iOS, Android, and Chrome Extension",
+      "Account Abstraction: Pay gas with any stablecoin",
+      "Biometric FaceID / Passkey authorization",
+      "Phishing protection and smart contract scanner",
     ],
-    stats: '85,000+ Downloads',
-    badge: 'Mobile & Web',
-    status: 'Live',
+    stats: "85,000+ Downloads",
+    badge: "Mobile & Web",
+    status: "Live",
   },
   {
-    id: 'explorer',
-    name: 'Mind Block Explorer',
-    category: 'Network Analytics',
-    tagline: 'Real-Time EVM Telemetry, Contract Verification & Gas Tracker',
+    id: "explorer",
+    name: "Mind Block Explorer",
+    category: "Network Analytics",
+    tagline: "Real-Time EVM Telemetry, Contract Verification & Gas Tracker",
     description:
-      'High-speed block explorer and smart contract analytics terminal. Inspect blocks, transactions, ERC-20/721/1155 tokens, internal contract calls, and gas spikes.',
+      "High-speed block explorer and smart contract analytics terminal. Inspect blocks, transactions, ERC-20/721/1155 tokens, internal contract calls, and gas spikes.",
     features: [
-      'Live WebSocket block streaming (0.8s block time)',
-      'One-click Solidity bytecode verification',
-      'DEX liquidity analytics and whale watcher alerts',
-      'Free REST & GraphQL Developer APIs',
+      "Live WebSocket block streaming (0.8s block time)",
+      "One-click Solidity bytecode verification",
+      "DEX liquidity analytics and whale watcher alerts",
+      "Free REST & GraphQL Developer APIs",
     ],
-    stats: '18.4M+ Blocks Indexed',
-    badge: 'Open API',
-    status: 'Live',
+    stats: "18.4M+ Blocks Indexed",
+    badge: "Open API",
+    status: "Live",
   },
   {
-    id: 'academy',
-    name: 'Mind Developer Academy',
-    category: 'Education & Grants',
-    tagline: 'Interactive Web3 Bootcamps, Grants & Developer Toolkits',
+    id: "academy",
+    name: "Mind Developer Academy",
+    category: "Education & Grants",
+    tagline: "Interactive Web3 Bootcamps, Grants & Developer Toolkits",
     description:
-      'Comprehensive educational hub for Solidity/Vyper developers building on MindChain. Apply for the $5,000,000 Ecosystem Developer Grant Program.',
+      "Comprehensive educational hub for Solidity/Vyper developers building on MindChain. Apply for the $5,000,000 Ecosystem Developer Grant Program.",
     features: [
-      '$5,000,000 Ecosystem Grant Fund actively awarding teams',
-      'Ready-to-deploy Audited Smart Contract Templates',
-      'Interactive Web3 Solidity sandbox & CLI guides',
-      'Official Developer Certification & NFT Badges',
+      "$5,000,000 Ecosystem Grant Fund actively awarding teams",
+      "Ready-to-deploy Audited Smart Contract Templates",
+      "Interactive Web3 Solidity sandbox & CLI guides",
+      "Official Developer Certification & NFT Badges",
     ],
-    stats: '$5M Grant Fund',
-    badge: 'Grants Open',
-    status: 'Live',
+    stats: "$5M Grant Fund",
+    badge: "Grants Open",
+    status: "Live",
   },
 ];
 
@@ -124,22 +121,24 @@ interface EcosystemGridProps {
   onSelectAction?: (id: string) => void;
 }
 
-export const EcosystemGrid: React.FC<EcosystemGridProps> = ({ onSelectAction }) => {
+export const EcosystemGrid: React.FC<EcosystemGridProps> = ({
+  onSelectAction,
+}) => {
   const [selectedItem, setSelectedItem] = useState<EcosystemItem | null>(null);
 
   const getIcon = (id: string) => {
     switch (id) {
-      case 'cex':
+      case "cex":
         return <TrendingUp className="w-6 h-6 text-cyan-400" />;
-      case 'dex':
+      case "dex":
         return <Repeat className="w-6 h-6 text-emerald-400" />;
-      case 'defi':
+      case "defi":
         return <Landmark className="w-6 h-6 text-teal-400" />;
-      case 'wallet':
+      case "wallet":
         return <Wallet2 className="w-6 h-6 text-cyan-300" />;
-      case 'explorer':
+      case "explorer":
         return <Search className="w-6 h-6 text-blue-400" />;
-      case 'academy':
+      case "academy":
         return <GraduationCap className="w-6 h-6 text-emerald-300" />;
       default:
         return <Layers className="w-6 h-6 text-cyan-400" />;
@@ -147,7 +146,10 @@ export const EcosystemGrid: React.FC<EcosystemGridProps> = ({ onSelectAction }) 
   };
 
   return (
-    <section id="ecosystem" className="py-16 sm:py-24 border-b border-slate-800/80 relative">
+    <section
+      id="ecosystem"
+      className="py-16 sm:py-24 border-b border-slate-800/80 relative"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
@@ -158,7 +160,9 @@ export const EcosystemGrid: React.FC<EcosystemGridProps> = ({ onSelectAction }) 
             An Interconnected Web3 Powerhouse
           </h2>
           <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
-            MindChain isn't just a layer-1 blockchain. It's a complete, vertically integrated financial ecosystem designed to capture and distribute real yield to MIND coin holders.
+            MindChain isn't just a layer-1 blockchain. It's a complete,
+            vertically integrated financial ecosystem designed to capture and
+            distribute real yield to MIND coin holders.
           </p>
         </div>
 
@@ -203,7 +207,10 @@ export const EcosystemGrid: React.FC<EcosystemGridProps> = ({ onSelectAction }) 
                 {/* Feature Bullets Preview */}
                 <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
                   {item.features.slice(0, 2).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-xs text-slate-400">
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 text-xs text-slate-400"
+                    >
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       <span className="truncate">{feat}</span>
                     </div>
@@ -213,9 +220,12 @@ export const EcosystemGrid: React.FC<EcosystemGridProps> = ({ onSelectAction }) 
 
               {/* Bottom Stat & View Link */}
               <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <span className="font-mono text-slate-300 font-bold">{item.stats}</span>
+                <span className="font-mono text-slate-300 font-bold">
+                  {item.stats}
+                </span>
                 <span className="text-cyan-400 group-hover:text-cyan-300 font-bold flex items-center gap-1">
-                  Details <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  Details{" "}
+                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </span>
               </div>
             </div>
@@ -232,8 +242,12 @@ export const EcosystemGrid: React.FC<EcosystemGridProps> = ({ onSelectAction }) 
                     {getIcon(selectedItem.id)}
                   </div>
                   <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-white">{selectedItem.name}</h3>
-                    <p className="text-xs font-mono text-cyan-400">{selectedItem.category}</p>
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      {selectedItem.name}
+                    </h3>
+                    <p className="text-xs font-mono text-cyan-400">
+                      {selectedItem.category}
+                    </p>
                   </div>
                 </div>
                 <button
@@ -244,7 +258,9 @@ export const EcosystemGrid: React.FC<EcosystemGridProps> = ({ onSelectAction }) 
                 </button>
               </div>
 
-              <p className="text-sm text-slate-300 leading-relaxed">{selectedItem.description}</p>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                {selectedItem.description}
+              </p>
 
               <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">
@@ -252,7 +268,10 @@ export const EcosystemGrid: React.FC<EcosystemGridProps> = ({ onSelectAction }) 
                 </p>
                 <div className="space-y-1.5">
                   {selectedItem.features.map((feat, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs text-slate-200">
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 text-xs text-slate-200"
+                    >
                       <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
                       <span>{feat}</span>
                     </div>

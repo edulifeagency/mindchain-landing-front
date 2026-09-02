@@ -1,44 +1,39 @@
-import React, { useState } from 'react';
-import { UserAccount } from '../types';
+import React, { useState } from "react";
+import { UserAccount } from "../types";
 import {
   generateRandomEVMAddress,
   isValidEVMAddress,
   DEMO_USER_ADDRESS,
   INITIAL_USER,
-} from '../utils/crypto';
-import {
-  Wallet,
-  KeyRound,
-  Lock,
-  ArrowRight,
-  Sparkles,
-  ShieldCheck,
-  Eye,
-  EyeOff,
-  UserCheck,
-  X,
-  Zap,
-} from 'lucide-react';
+} from "../utils/crypto";
+import { Wallet, Sparkles, Eye, EyeOff, UserCheck, X, Zap } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import api from "../lib/api";
 
 interface AuthModalProps {
   isOpen: boolean;
-  initialMode?: 'login' | 'signup';
+  initialMode?: "login" | "signup";
   onClose: () => void;
   onSuccess: (user: UserAccount) => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
-  initialMode = 'login',
+  initialMode = "login",
   onClose,
   onSuccess,
 }) => {
-  const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
-  const [address, setAddress] = useState<string>('');
-  const [pin, setPin] = useState<string>('');
-  const [referralCode, setReferralCode] = useState<string>('');
+  const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  const [address, setAddress] = useState<string>("");
+  const [pin, setPin] = useState<string>("");
+  const [referralCode, setReferralCode] = useState<string>("");
   const [showPin, setShowPin] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const loginMutation = useMutation({
+    mutationFn: () => api.post("/auth/login"),
+    onSuccess: () => {},
+  });
 
   if (!isOpen) return null;
 
@@ -59,33 +54,35 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     const trimmedAddress = address.trim();
     if (!trimmedAddress) {
-      setError('Please enter your EVM Wallet Address');
+      setError("Please enter your EVM Wallet Address");
       return;
     }
 
     if (!isValidEVMAddress(trimmedAddress)) {
-      setError('Invalid EVM address format. Must start with 0x and be 42 characters.');
+      setError(
+        "Invalid EVM address format. Must start with 0x and be 42 characters.",
+      );
       return;
     }
 
     if (!pin || pin.length < 4) {
-      setError('Please enter a 4-8 digit Secret PIN for session protection.');
+      setError("Please enter a 4-8 digit Secret PIN for session protection.");
       return;
     }
 
     // Lookup existing account in localStorage or create new
     try {
-      const storedUsersRaw = localStorage.getItem('mindchain_users');
+      const storedUsersRaw = localStorage.getItem("mindchain_users");
       const users: Record<string, UserAccount> = storedUsersRaw
         ? JSON.parse(storedUsersRaw)
         : {};
 
       const lowerAddr = trimmedAddress.toLowerCase();
 
-      if (mode === 'login') {
+      if (mode === "login") {
         if (users[lowerAddr]) {
           if (users[lowerAddr].pin && users[lowerAddr].pin !== pin) {
-            setError('Incorrect PIN for this EVM address.');
+            setError("Incorrect PIN for this EVM address.");
             return;
           }
           onSuccess(users[lowerAddr]);
@@ -97,20 +94,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           const newUser: UserAccount = {
             address: trimmedAddress,
             pin,
-            name: isDemo ? 'Alexander Wright' : 'Web3 Investor',
-            email: isDemo ? 'alexander.wright@mindchain.io' : '',
-            physicalAddress: isDemo ? '742 Evergreen Terrace, Suite 400, Austin, TX 78701, United States' : '',
-            phone: isDemo ? '+1 (512) 555-0198' : '',
-            balanceMIND: isDemo ? 5432.80 : 0,
+            name: isDemo ? "Alexander Wright" : "Web3 Investor",
+            email: isDemo ? "alexander.wright@mindchain.io" : "",
+            physicalAddress: isDemo
+              ? "742 Evergreen Terrace, Suite 400, Austin, TX 78701, United States"
+              : "",
+            phone: isDemo ? "+1 (512) 555-0198" : "",
+            balanceMIND: isDemo ? 5432.8 : 0,
             totalDepositedUSD: isDemo ? 1750.0 : 0,
             referralsCount: isDemo ? 8 : 0,
             referralEarningsMIND: isDemo ? 1591.47 : 0,
-            referralEarningsUSD: isDemo ? 652.50 : 0,
+            referralEarningsUSD: isDemo ? 652.5 : 0,
             referralCode: `MIND-${trimmedAddress.substring(2, 7).toUpperCase()}`,
-            joinedDate: 'August 2026',
+            joinedDate: "August 2026",
           };
           users[lowerAddr] = newUser;
-          localStorage.setItem('mindchain_users', JSON.stringify(users));
+          localStorage.setItem("mindchain_users", JSON.stringify(users));
           onSuccess(newUser);
           onClose();
           return;
@@ -120,20 +119,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         const newUser: UserAccount = {
           address: trimmedAddress,
           pin,
-          name: 'Web3 Pioneer',
-          email: '',
-          physicalAddress: '',
-          phone: '',
+          name: "Web3 Pioneer",
+          email: "",
+          physicalAddress: "",
+          phone: "",
           balanceMIND: 0,
           totalDepositedUSD: 0,
           referralsCount: 0,
           referralEarningsMIND: 0,
           referralEarningsUSD: 0,
           referralCode: `MIND-${trimmedAddress.substring(2, 7).toUpperCase()}`,
-          joinedDate: 'August 2026',
+          joinedDate: "August 2026",
         };
         users[lowerAddr] = newUser;
-        localStorage.setItem('mindchain_users', JSON.stringify(users));
+        localStorage.setItem("mindchain_users", JSON.stringify(users));
         onSuccess(newUser);
         onClose();
       }
@@ -142,17 +141,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const fallbackUser: UserAccount = {
         address: trimmedAddress,
         pin,
-        name: 'Web3 Pioneer',
-        email: '',
-        physicalAddress: '',
-        phone: '',
+        name: "Web3 Pioneer",
+        email: "",
+        physicalAddress: "",
+        phone: "",
         balanceMIND: 0,
         totalDepositedUSD: 0,
         referralsCount: 0,
         referralEarningsMIND: 0,
         referralEarningsUSD: 0,
         referralCode: `MIND-${trimmedAddress.substring(2, 7).toUpperCase()}`,
-        joinedDate: 'August 2026',
+        joinedDate: "August 2026",
       };
       onSuccess(fallbackUser);
       onClose();
@@ -163,7 +162,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
       <div className="bg-[#1e293b] border border-slate-700/90 max-w-md w-full max-h-[92vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden relative text-white my-auto">
         {/* Top Gradient Bar */}
-        <div className="h-1.5 bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 shrink-0"></div>
+        <div className="h-1.5 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 shrink-0"></div>
 
         {/* Close Button */}
         <button
@@ -176,17 +175,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="p-5 sm:p-7 overflow-y-auto">
           {/* Header */}
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-cyan-500/20 to-emerald-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
               <Wallet className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-white">
-                {mode === 'login' ? 'Connect EVM Account' : 'Create MindChain ID'}
+                {mode === "login"
+                  ? "Connect EVM Account"
+                  : "Create MindChain ID"}
               </h3>
               <p className="text-xs text-slate-400">
-                {mode === 'login'
-                  ? 'Access your presale allocations and dashboard'
-                  : 'No seed phrases needed. Protected by your PIN.'}
+                {mode === "login"
+                  ? "Access your presale allocations and dashboard"
+                  : "No seed phrases needed. Protected by your PIN."}
               </p>
             </div>
           </div>
@@ -196,13 +197,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => {
-                setMode('login');
+                setMode("login");
                 setError(null);
               }}
               className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                mode === 'login'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                  : 'text-slate-400 hover:text-white'
+                mode === "login"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               Sign In
@@ -210,13 +211,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => {
-                setMode('signup');
+                setMode("signup");
                 setError(null);
               }}
               className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                mode === 'signup'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                  : 'text-slate-400 hover:text-white'
+                mode === "signup"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               New Signup
@@ -264,12 +265,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                   Secret PIN / Password
                 </label>
-                <span className="text-[10px] text-slate-400 font-mono">4-8 Digits</span>
+                <span className="text-[10px] text-slate-400 font-mono">
+                  4-8 Digits
+                </span>
               </div>
 
               <div className="relative flex items-center">
                 <input
-                  type={showPin ? 'text' : 'password'}
+                  type={showPin ? "text" : "password"}
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   placeholder="••••"
@@ -281,13 +284,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onClick={() => setShowPin(!showPin)}
                   className="absolute right-3 text-slate-500 hover:text-slate-300"
                 >
-                  {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPin ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
 
             {/* Referral Code (only in signup mode) */}
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
                   Referral Code (Optional)
@@ -305,27 +312,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* Submit CTA */}
             <button
               type="submit"
-              className="w-full py-3.5 bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs shadow-lg shadow-cyan-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+              className="w-full py-3.5 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs shadow-lg shadow-cyan-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
             >
               <UserCheck className="w-4 h-4" />
-              {mode === 'login' ? 'Authenticate & Enter' : 'Complete Registration'}
+              {mode === "login"
+                ? "Authenticate & Enter"
+                : "Complete Registration"}
             </button>
           </form>
-
-          {/* Quick Demo Login Preset */}
-          <div className="mt-5 pt-4 border-t border-slate-800/80">
-            <p className="text-[11px] text-slate-400 text-center mb-2.5">
-              Want to test without typing?
-            </p>
-            <button
-              type="button"
-              onClick={handleQuickDemo}
-              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800/90 text-cyan-300 font-bold rounded-xl text-xs border border-slate-700 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5 text-emerald-400" />
-              One-Click Demo Connect (0x71C...89A)
-            </button>
-          </div>
         </div>
       </div>
     </div>

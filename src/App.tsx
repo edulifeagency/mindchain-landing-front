@@ -1,20 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { UserAccount, Transaction, PaymentInvoice, AppliedCoupon } from './types';
-import { INITIAL_TRANSACTIONS, INITIAL_USER } from './utils/crypto';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
-import { ScrollToTop } from './components/ScrollToTop';
-import { ToastContainer, ToastMessage } from './components/Toast';
-import { AuthModal } from './components/AuthModal';
-import { InvoiceModal } from './components/InvoiceModal';
-import { Dashboard } from './components/Dashboard';
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import {
+  UserAccount,
+  Transaction,
+  PaymentInvoice,
+  AppliedCoupon,
+} from "./types";
+import { INITIAL_TRANSACTIONS, INITIAL_USER } from "./utils/crypto";
+import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
+import { ScrollToTop } from "./components/ScrollToTop";
+import { ToastContainer, ToastMessage } from "./components/Toast";
+import { AuthModal } from "./components/AuthModal";
+import { InvoiceModal } from "./components/InvoiceModal";
+import { Dashboard } from "./components/Dashboard";
 
-import { HomePage } from './pages/HomePage';
-import { PresalePage } from './pages/PresalePage';
-import { EcosystemPage } from './pages/EcosystemPage';
-import { TokenomicsPage } from './pages/TokenomicsPage';
-import { Lock, Wallet, Zap, ShieldCheck } from 'lucide-react';
+import { HomePage } from "./pages/HomePage";
+import { PresalePage } from "./pages/PresalePage";
+import { EcosystemPage } from "./pages/EcosystemPage";
+import { TokenomicsPage } from "./pages/TokenomicsPage";
+import { Lock, Wallet, Zap, ShieldCheck } from "lucide-react";
+import { ClientProviders } from "./components/ClientProviders";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -23,7 +36,7 @@ function AppContent() {
   // App state
   const [user, setUser] = useState<UserAccount | null>(() => {
     try {
-      const saved = localStorage.getItem('mindchain_active_user');
+      const saved = localStorage.getItem("mindchain_active_user");
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -32,7 +45,7 @@ function AppContent() {
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
-      const saved = localStorage.getItem('mindchain_txs');
+      const saved = localStorage.getItem("mindchain_txs");
       return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
     } catch {
       return INITIAL_TRANSACTIONS;
@@ -41,18 +54,26 @@ function AppContent() {
 
   // Modal States
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [selectedBuyAmount, setSelectedBuyAmount] = useState<number>(100);
-  const [selectedCoupon, setSelectedCoupon] = useState<AppliedCoupon | null>(null);
+  const [selectedCoupon, setSelectedCoupon] = useState<AppliedCoupon | null>(
+    null,
+  );
 
   const [pendingBuyAmount, setPendingBuyAmount] = useState<number | null>(null);
-  const [pendingCoupon, setPendingCoupon] = useState<AppliedCoupon | null>(null);
+  const [pendingCoupon, setPendingCoupon] = useState<AppliedCoupon | null>(
+    null,
+  );
 
   // Toast notifications
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  const addToast = (title: string, message?: string, type: 'success' | 'error' | 'info' = 'info') => {
+  const addToast = (
+    title: string,
+    message?: string,
+    type: "success" | "error" | "info" = "info",
+  ) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`;
     setToasts((prev) => [...prev, { id, title, message, type }]);
 
@@ -69,19 +90,19 @@ function AppContent() {
   // Sync user state to localStorage
   useEffect(() => {
     if (user) {
-      localStorage.setItem('mindchain_active_user', JSON.stringify(user));
+      localStorage.setItem("mindchain_active_user", JSON.stringify(user));
     } else {
-      localStorage.removeItem('mindchain_active_user');
+      localStorage.removeItem("mindchain_active_user");
     }
   }, [user]);
 
   // Sync transactions to localStorage
   useEffect(() => {
-    localStorage.setItem('mindchain_txs', JSON.stringify(transactions));
+    localStorage.setItem("mindchain_txs", JSON.stringify(transactions));
   }, [transactions]);
 
   // Handlers
-  const handleOpenAuth = (mode: 'login' | 'signup' = 'login') => {
+  const handleOpenAuth = (mode: "login" | "signup" = "login") => {
     setAuthMode(mode);
     setIsAuthOpen(true);
   };
@@ -89,9 +110,9 @@ function AppContent() {
   const handleAuthSuccess = (authenticatedUser: UserAccount) => {
     setUser(authenticatedUser);
     addToast(
-      'Session Connected',
+      "Session Connected",
       `Authenticated with EVM ID: ${authenticatedUser.address.substring(0, 6)}...${authenticatedUser.address.substring(38)}`,
-      'success'
+      "success",
     );
 
     // If user initiated a buy before logging in, proceed to invoice modal
@@ -103,19 +124,22 @@ function AppContent() {
       setPendingCoupon(null);
     } else {
       // If current page is not already under /dashboard, navigate to /dashboard
-      if (!location.pathname.startsWith('/dashboard')) {
-        navigate('/dashboard');
+      if (!location.pathname.startsWith("/dashboard")) {
+        navigate("/dashboard");
       }
     }
   };
 
   const handleLogout = () => {
     setUser(null);
-    navigate('/');
-    addToast('Disconnected', 'Your EVM session has been cleared.', 'info');
+    navigate("/");
+    addToast("Disconnected", "Your EVM session has been cleared.", "info");
   };
 
-  const handleOpenBuyFlow = (amount?: number, coupon?: AppliedCoupon | null) => {
+  const handleOpenBuyFlow = (
+    amount?: number,
+    coupon?: AppliedCoupon | null,
+  ) => {
     const finalAmount = amount || 100;
     const finalCoupon = coupon || null;
 
@@ -123,12 +147,12 @@ function AppContent() {
     if (!user) {
       setPendingBuyAmount(finalAmount);
       setPendingCoupon(finalCoupon);
-      setAuthMode('signup');
+      setAuthMode("signup");
       setIsAuthOpen(true);
       addToast(
-        'Authentication Required',
-        'Please create an account or sign in to purchase MIND with exclusive bonus benefits.',
-        'info'
+        "Authentication Required",
+        "Please create an account or sign in to purchase MIND with exclusive bonus benefits.",
+        "info",
       );
       return;
     }
@@ -138,7 +162,10 @@ function AppContent() {
     setIsInvoiceOpen(true);
   };
 
-  const handlePaymentSuccess = (invoice: PaymentInvoice, completedTx: Transaction) => {
+  const handlePaymentSuccess = (
+    invoice: PaymentInvoice,
+    completedTx: Transaction,
+  ) => {
     let targetUser = user;
     if (!targetUser) {
       targetUser = {
@@ -160,13 +187,13 @@ function AppContent() {
     setTransactions((prev) => [completedTx, ...prev]);
 
     addToast(
-      'Payment Confirmed!',
+      "Payment Confirmed!",
       `Successfully credited ${invoice.totalMind.toFixed(2)} MIND to your wallet`,
-      'success'
+      "success",
     );
 
     // Switch to dashboard history or overview
-    navigate('/dashboard/history');
+    navigate("/dashboard/history");
   };
 
   const handleAddTransaction = (newTx: Transaction) => {
@@ -186,7 +213,7 @@ function AppContent() {
         onOpenAuth={handleOpenAuth}
         onOpenBuy={() => handleOpenBuyFlow(100)}
         onLogout={handleLogout}
-        onCopyAddress={(addr) => addToast('Address Copied', addr, 'info')}
+        onCopyAddress={(addr) => addToast("Address Copied", addr, "info")}
       />
 
       {/* Dynamic View Routing */}
@@ -195,14 +222,21 @@ function AppContent() {
           {/* Landing / Home Page */}
           <Route
             path="/"
-            element={<HomePage isLoggedIn={!!user} onOpenBuyFlow={handleOpenBuyFlow} />}
+            element={
+              <HomePage isLoggedIn={!!user} onOpenBuyFlow={handleOpenBuyFlow} />
+            }
           />
           <Route path="/home" element={<Navigate to="/" replace />} />
 
           {/* Dedicated Presale Page */}
           <Route
             path="/presale"
-            element={<PresalePage isLoggedIn={!!user} onOpenBuyFlow={handleOpenBuyFlow} />}
+            element={
+              <PresalePage
+                isLoggedIn={!!user}
+                onOpenBuyFlow={handleOpenBuyFlow}
+              />
+            }
           />
 
           {/* Ecosystem Page */}
@@ -213,7 +247,10 @@ function AppContent() {
 
           {/* Tokenomics & Comparison Page */}
           <Route path="/tokenomics" element={<TokenomicsPage />} />
-          <Route path="/specs" element={<Navigate to="/tokenomics" replace />} />
+          <Route
+            path="/specs"
+            element={<Navigate to="/tokenomics" replace />}
+          />
 
           {/* Dashboard and Subroutes */}
           <Route
@@ -223,7 +260,9 @@ function AppContent() {
                 <Dashboard
                   user={user}
                   transactions={transactions}
-                  onOpenBuy={(amount, coupon) => handleOpenBuyFlow(amount, coupon)}
+                  onOpenBuy={(amount, coupon) =>
+                    handleOpenBuyFlow(amount, coupon)
+                  }
                   onLogout={handleLogout}
                   onUpdateUser={(updated) => setUser(updated)}
                   onAddTransaction={handleAddTransaction}
@@ -237,21 +276,25 @@ function AppContent() {
                       <Lock className="w-7 h-7" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-xl font-bold text-white">Dashboard Access Locked</h2>
+                      <h2 className="text-xl font-bold text-white">
+                        Dashboard Access Locked
+                      </h2>
                       <p className="text-xs text-slate-400 leading-relaxed">
-                        Connect your Web3 EVM wallet session or sign in to access your portfolio balance, referral commissions, and order records.
+                        Connect your Web3 EVM wallet session or sign in to
+                        access your portfolio balance, referral commissions, and
+                        order records.
                       </p>
                     </div>
                     <div className="space-y-3 pt-2">
                       <button
-                        onClick={() => handleOpenAuth('login')}
-                        className="w-full py-3 bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
+                        onClick={() => handleOpenAuth("login")}
+                        className="w-full py-3 bg-linear-to-r from-cyan-400 to-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
                       >
                         <Wallet className="w-4 h-4" />
                         Connect EVM Session
                       </button>
                       <button
-                        onClick={() => handleOpenAuth('signup')}
+                        onClick={() => handleOpenAuth("signup")}
                         className="w-full py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
                       >
                         Create New Account
@@ -294,7 +337,9 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <ClientProviders>
+        <AppContent />
+      </ClientProviders>
     </BrowserRouter>
   );
 }

@@ -1,27 +1,12 @@
-import React, { useState } from 'react';
-import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { UserAccount } from '../types';
-import { MIND_PRICE_USD, truncateAddress } from '../utils/crypto';
-import {
-  Layers,
-  Wallet,
-  LogOut,
-  ChevronDown,
-  Menu,
-  X,
-  ExternalLink,
-  Copy,
-  Check,
-  ShieldCheck,
-  Zap,
-  HelpCircle,
-  BarChart3,
-  User,
-} from 'lucide-react';
+import React, { useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { UserAccount } from "../types";
+import { MIND_PRICE_USD, truncateAddress } from "../utils/crypto";
+import { Layers, LogOut, Menu, X, Copy, Check, Zap } from "lucide-react";
 
 interface NavbarProps {
   user: UserAccount | null;
-  onOpenAuth: (mode?: 'login' | 'signup') => void;
+  onOpenAuth: (mode?: "login" | "signup") => void;
   onOpenBuy: () => void;
   onLogout: () => void;
   onCopyAddress?: (addr: string) => void;
@@ -36,7 +21,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
 
   const handleCopy = (e: React.MouseEvent) => {
@@ -49,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
-  const isDashboardActive = location.pathname.startsWith('/dashboard');
+  const isDashboardActive = location.pathname.startsWith("/dashboard");
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-[#0f172a]/85 backdrop-blur-md">
@@ -66,13 +50,26 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="w-full h-full transform group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_10px_rgba(6,182,212,0.4)]"
             >
               <defs>
-                <linearGradient id="mndNavGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient
+                  id="mndNavGrad"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
                   <stop offset="0%" stopColor="#22d3ee" />
                   <stop offset="50%" stopColor="#14b8a6" />
                   <stop offset="100%" stopColor="#10b981" />
                 </linearGradient>
               </defs>
-              <rect width="36" height="36" rx="10" fill="#0f172a" stroke="url(#mndNavGrad)" strokeWidth="1.5" />
+              <rect
+                width="36"
+                height="36"
+                rx="10"
+                fill="#0f172a"
+                stroke="url(#mndNavGrad)"
+                strokeWidth="1.5"
+              />
               <path
                 d="M9 25V11L18 18L27 11V25"
                 stroke="url(#mndNavGrad)"
@@ -109,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             end
             className={({ isActive }) =>
               `transition-colors py-1 hover:text-cyan-400 cursor-pointer ${
-                isActive ? 'text-cyan-400 font-semibold' : 'text-slate-300'
+                isActive ? "text-cyan-400 font-semibold" : "text-slate-300"
               }`
             }
           >
@@ -120,7 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             to="/presale"
             className={({ isActive }) =>
               `transition-colors py-1 hover:text-cyan-400 cursor-pointer flex items-center gap-1 ${
-                isActive ? 'text-cyan-400 font-semibold' : 'text-slate-300'
+                isActive ? "text-cyan-400 font-semibold" : "text-slate-300"
               }`
             }
           >
@@ -132,7 +129,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             to="/ecosystem"
             className={({ isActive }) =>
               `transition-colors py-1 hover:text-cyan-400 cursor-pointer ${
-                isActive ? 'text-cyan-400 font-semibold' : 'text-slate-300'
+                isActive ? "text-cyan-400 font-semibold" : "text-slate-300"
               }`
             }
           >
@@ -143,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             to="/tokenomics"
             className={({ isActive }) =>
               `transition-colors py-1 hover:text-cyan-400 cursor-pointer ${
-                isActive ? 'text-cyan-400 font-semibold' : 'text-slate-300'
+                isActive ? "text-cyan-400 font-semibold" : "text-slate-300"
               }`
             }
           >
@@ -155,7 +152,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               to="/dashboard"
               className={({ isActive }) =>
                 `transition-colors py-1 hover:text-cyan-400 cursor-pointer flex items-center gap-1.5 ${
-                  isActive || isDashboardActive ? 'text-cyan-400 font-semibold' : 'text-slate-300'
+                  isActive || isDashboardActive
+                    ? "text-cyan-400 font-semibold"
+                    : "text-slate-300"
                 }`
               }
             >
@@ -184,19 +183,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* User Auth Buttons / State */}
           {user ? (
             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              <Link
-                to="/dashboard"
-                className={`text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer ${
-                  isDashboardActive
-                    ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'
-                    : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white'
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden xs:inline">My </span>
-                <span>Dashboard</span>
-              </Link>
-
               <div
                 onClick={handleCopy}
                 title="Click to copy address"
@@ -224,7 +210,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <button
-                onClick={() => onOpenAuth('login')}
+                onClick={() => onOpenAuth("login")}
                 className="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
               >
                 Connect
@@ -233,7 +219,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={onOpenBuy}
                 className="relative group overflow-hidden rounded-xl p-px font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shrink-0"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 transition-all"></span>
+                <span className="absolute inset-0 bg-linear-to-r from-cyan-400 via-teal-300 to-emerald-400 transition-all"></span>
                 <span className="relative flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-[11px] bg-slate-950 text-cyan-300 transition-colors group-hover:bg-transparent group-hover:text-slate-950 font-extrabold uppercase tracking-wider text-[11px] sm:text-xs whitespace-nowrap">
                   <Zap className="w-3.5 h-3.5 shrink-0 fill-current" />
                   <span>Buy MIND</span>
@@ -248,7 +234,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="md:hidden p-1.5 sm:p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 cursor-pointer shrink-0"
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>
@@ -302,7 +292,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="pt-2 border-t border-slate-800/80 flex flex-col gap-2.5">
               <button
                 onClick={() => {
-                  onOpenAuth('login');
+                  onOpenAuth("login");
                   setMobileMenuOpen(false);
                 }}
                 className="w-full py-3 bg-slate-800/90 hover:bg-slate-700 rounded-xl text-center text-xs font-bold text-white border border-slate-700 transition-colors cursor-pointer"
@@ -314,7 +304,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onOpenBuy();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full py-3 bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 rounded-xl text-center text-xs font-black text-slate-950 uppercase tracking-wider shadow-lg shadow-cyan-500/20 cursor-pointer"
+                className="w-full py-3 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 rounded-xl text-center text-xs font-black text-slate-950 uppercase tracking-wider shadow-lg shadow-cyan-500/20 cursor-pointer"
               >
                 Buy MIND (USDT BEP-20)
               </button>
