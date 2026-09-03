@@ -282,7 +282,7 @@ export default function App() {
 
   const { data: config } = useQuery<SiteConfig>({
     queryKey: ["settings"],
-    queryFn: () => api.get("/settings").then((res) => res.data),
+    queryFn: () => api.get("/settings").then((res) => res.data.data),
   });
 
   useEffect(() => {

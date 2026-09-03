@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   MIND_PRICE_USD,
   calculateMindAmount,
@@ -6,8 +6,8 @@ import {
   formatUSD,
   validateCoupon,
   ACTIVE_COUPONS,
-} from '../utils/crypto';
-import { AppliedCoupon } from '../types';
+} from "../utils/crypto";
+import { AppliedCoupon } from "../types";
 import {
   ArrowDown,
   Zap,
@@ -18,7 +18,8 @@ import {
   X,
   AlertCircle,
   Percent,
-} from 'lucide-react';
+} from "lucide-react";
+import { useLayoutStore } from "../store/useLayoutStore";
 
 interface PresaleCalculatorProps {
   onProceedToPay: (usdAmount: number, coupon?: AppliedCoupon | null) => void;
@@ -28,29 +29,44 @@ interface PresaleCalculatorProps {
 
 export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   onProceedToPay,
-  className = '',
+  className = "",
   isLoggedIn = false,
 }) => {
-  const [usdInput, setUsdInput] = useState<string>('100');
-  const [couponCodeInput, setCouponCodeInput] = useState<string>('');
-  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [usdInput, setUsdInput] = useState<string>("100");
+  const [couponCodeInput, setCouponCodeInput] = useState<string>("");
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
+    null,
+  );
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccessMsg, setCouponSuccessMsg] = useState<string | null>(null);
   const [isCouponOpen, setIsCouponOpen] = useState<boolean>(false);
+  const purchaseSlots = useLayoutStore(
+    (state) => state.siteConfig?.purchase.purchase_slots,
+  );
 
   const numericUsd = parseFloat(usdInput) || 0;
-  const { baseMind, bonusPercent, bonusMind, totalMind } = calculateMindAmount(numericUsd);
+  const { baseMind } = calculateMindAmount(numericUsd);
+
+  const currentSlot = purchaseSlots?.find(
+    (s) => numericUsd >= s.min_usd && numericUsd <= s.max_usd,
+  );
+  const bonusPercent = currentSlot?.bonus_percentage ?? 0;
+  const bonusMind = (baseMind * bonusPercent) / 100;
+  const totalMind = baseMind + bonusMind;
 
   // Recalculate discount whenever numericUsd changes if coupon is active
   const discountAmount = appliedCoupon
     ? Number(((numericUsd * appliedCoupon.discountPercent) / 100).toFixed(2))
     : 0;
-  const payableUsd = Math.max(0, Number((numericUsd - discountAmount).toFixed(2)));
+  const payableUsd = Math.max(
+    0,
+    Number((numericUsd - discountAmount).toFixed(2)),
+  );
 
   const presetAmounts = [100, 250, 500, 1000, 2500, 5000];
 
   const handleInputChange = (val: string) => {
-    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+    if (val === "" || /^\d*\.?\d*$/.test(val)) {
       setUsdInput(val);
       setCouponError(null);
     }
@@ -64,7 +80,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   const handleApplyCoupon = (codeToApply?: string) => {
     const targetCode = (codeToApply || couponCodeInput).trim();
     if (!targetCode) {
-      setCouponError('Please enter a coupon code');
+      setCouponError("Please enter a coupon code");
       setCouponSuccessMsg(null);
       return;
     }
@@ -74,7 +90,9 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
       setAppliedCoupon(validated);
       setCouponCodeInput(validated.code);
       setCouponError(null);
-      setCouponSuccessMsg(`${validated.code} applied! You get ${validated.discountPercent}% discount.`);
+      setCouponSuccessMsg(
+        `${validated.code} applied! You get ${validated.discountPercent}% discount.`,
+      );
       setIsCouponOpen(true);
     } else {
       setCouponError(`Invalid coupon "${targetCode}". Try MIND3 for 3% off.`);
@@ -84,7 +102,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
 
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
-    setCouponCodeInput('');
+    setCouponCodeInput("");
     setCouponError(null);
     setCouponSuccessMsg(null);
   };
@@ -110,11 +128,15 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
               Official Bonus Rate
             </span>
           </div>
-          <h3 className="text-xl font-extrabold text-white mt-1">Buy MIND Coin</h3>
+          <h3 className="text-xl font-extrabold text-white mt-1">
+            Buy MIND Coin
+          </h3>
         </div>
         <div className="text-right">
           <p className="text-[10px] uppercase font-mono text-slate-400">Rate</p>
-          <p className="text-sm font-black text-cyan-400 font-mono">1 MIND = ${MIND_PRICE_USD} USD</p>
+          <p className="text-sm font-black text-cyan-400 font-mono">
+            1 MIND = ${MIND_PRICE_USD} USD
+          </p>
         </div>
       </div>
 
@@ -126,11 +148,15 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-300 font-mono">
               Buy Amount (USD)
             </label>
-            <span className="text-[11px] font-mono text-slate-400">Min: $10</span>
+            <span className="text-[11px] font-mono text-slate-400">
+              Min: $10
+            </span>
           </div>
 
           <div className="relative flex items-center">
-            <span className="absolute left-3.5 text-slate-400 font-mono text-lg font-bold">$</span>
+            <span className="absolute left-3.5 text-slate-400 font-mono text-lg font-bold">
+              $
+            </span>
             <input
               type="text"
               value={usdInput}
@@ -140,7 +166,9 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
             />
             <div className="absolute right-2.5 flex items-center gap-1.5 bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-lg">
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span className="text-xs font-bold text-emerald-400 font-mono">USDT</span>
+              <span className="text-xs font-bold text-emerald-400 font-mono">
+                USDT
+              </span>
             </div>
           </div>
 
@@ -153,8 +181,8 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
                 onClick={() => handlePresetClick(amt)}
                 className={`py-2 sm:py-1.5 rounded-lg text-xs font-mono font-bold transition-all border cursor-pointer ${
                   numericUsd === amt
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
-                    : 'bg-slate-900/90 hover:bg-slate-800 text-slate-300 border-slate-800 hover:border-slate-700'
+                    ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/50"
+                    : "bg-slate-900/90 hover:bg-slate-800 text-slate-300 border-slate-800 hover:border-slate-700"
                 }`}
               >
                 ${amt >= 1000 ? `${amt / 1000}k` : amt}
@@ -178,11 +206,19 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
             </label>
             {bonusPercent > 0 ? (
               <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1 font-mono">
-                <Sparkles className="w-3 h-3 shrink-0" /> +{bonusPercent}% Bonus Included
+                <Sparkles className="w-3 h-3 shrink-0" /> +{bonusPercent}% Bonus
+                Included
               </span>
             ) : (
               <span className="text-[10px] sm:text-[11px] font-mono text-slate-400">
-                Bonus: $500 (+5%), $1k (+10%)
+                Bonus:{" "}
+                {purchaseSlots
+                  ?.filter((s) => s.bonus_percentage > 0)
+                  .map(
+                    (s) =>
+                      `$${formatNumber(s.min_usd)} (+${s.bonus_percentage}%)`,
+                  )
+                  .join(", ")}
               </span>
             )}
           </div>
@@ -195,7 +231,9 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
               className="w-full bg-slate-950 border border-slate-700/80 rounded-xl py-3 px-4 text-cyan-300 font-mono text-lg sm:text-xl font-extrabold outline-none cursor-default"
             />
             <div className="absolute right-2.5 flex items-center gap-1 bg-cyan-950/60 border border-cyan-500/30 px-3 py-1 rounded-lg">
-              <span className="text-xs font-black text-cyan-300 font-mono">MIND</span>
+              <span className="text-xs font-black text-cyan-300 font-mono">
+                MIND
+              </span>
             </div>
           </div>
 
@@ -203,7 +241,9 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
           <div className="mt-2 px-3 py-2 bg-slate-950/50 rounded-xl border border-slate-800/80 flex flex-wrap items-center justify-between gap-1 text-xs font-mono text-slate-400">
             <span>Base: {formatNumber(baseMind)} MIND</span>
             {bonusPercent > 0 ? (
-              <span className="text-emerald-400 font-bold">Bonus: +{formatNumber(bonusMind)} MIND</span>
+              <span className="text-emerald-400 font-bold">
+                Bonus: +{formatNumber(bonusMind)} MIND
+              </span>
             ) : (
               <span className="text-slate-400">Standard Tier</span>
             )}
@@ -221,13 +261,17 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
                   className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Tag className="w-3.5 h-3.5 shrink-0" />
-                  <span>{isCouponOpen ? 'Hide Coupon Code' : 'Have a Promo / Coupon Code?'}</span>
+                  <span>
+                    {isCouponOpen
+                      ? "Hide Coupon Code"
+                      : "Have a Promo / Coupon Code?"}
+                  </span>
                 </button>
 
                 {/* Quick 1-click apply suggestion */}
                 <button
                   type="button"
-                  onClick={() => handleApplyCoupon('MIND3')}
+                  onClick={() => handleApplyCoupon("MIND3")}
                   className="px-2.5 py-1 rounded-md bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1"
                 >
                   <Percent className="w-3 h-3 text-cyan-400 shrink-0" />
@@ -248,7 +292,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
                           setCouponError(null);
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             e.preventDefault();
                             handleApplyCoupon();
                           }
@@ -285,12 +329,16 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-mono font-black text-white">{appliedCoupon.code}</span>
+                      <span className="text-xs font-mono font-black text-white">
+                        {appliedCoupon.code}
+                      </span>
                       <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold">
                         {appliedCoupon.discountPercent}% OFF
                       </span>
                     </div>
-                    <p className="text-[10px] text-emerald-300/80 font-mono">{appliedCoupon.description}</p>
+                    <p className="text-[10px] text-emerald-300/80 font-mono">
+                      {appliedCoupon.description}
+                    </p>
                   </div>
                 </div>
 
@@ -307,7 +355,10 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
               {/* Discount Summary Row */}
               <div className="pt-2 border-t border-emerald-500/20 flex items-center justify-between text-xs font-mono">
                 <span className="text-slate-300">
-                  Buy Value: <span className="line-through text-slate-400">{formatUSD(numericUsd)}</span>
+                  Buy Value:{" "}
+                  <span className="line-through text-slate-400">
+                    {formatUSD(numericUsd)}
+                  </span>
                 </span>
                 <span className="text-emerald-400 font-bold">
                   Discount: -{formatUSD(discountAmount)}
@@ -320,7 +371,9 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
         {/* Final Payable Box if coupon is applied */}
         {appliedCoupon && (
           <div className="px-3.5 py-2.5 bg-gradient-to-r from-emerald-950/40 to-slate-950 rounded-xl border border-emerald-500/30 flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-300 font-semibold">Final Payable Amount:</span>
+            <span className="text-slate-300 font-semibold">
+              Final Payable Amount:
+            </span>
             <span className="text-emerald-400 text-sm font-black">
               {formatUSD(payableUsd)} USDT
             </span>
@@ -342,7 +395,9 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
         {/* Clean trust note */}
         <div className="pt-2 text-center text-[11px] text-slate-400 flex items-center justify-center gap-2">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <span>Instant EVM credit • Transfer & sell anytime on mindchain.info</span>
+          <span>
+            Instant EVM credit • Transfer & sell anytime on mindchain.info
+          </span>
         </div>
       </form>
     </div>
