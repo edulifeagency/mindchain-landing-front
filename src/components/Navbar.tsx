@@ -1,34 +1,52 @@
 import React, { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { UserAccount } from "../types";
 import { MIND_PRICE_USD, truncateAddress } from "../utils/crypto";
-import { Layers, LogOut, Menu, X, Copy, Check, Zap } from "lucide-react";
+import {
+  Layers,
+  LogOut,
+  Menu,
+  X,
+  Copy,
+  Check,
+  Zap,
+  Loader2,
+} from "lucide-react";
+import { useUserStore } from "../store/useUserStore";
+import { useMutation } from "@tanstack/react-query";
+import api from "../lib/api";
+import Cookies from "js-cookie";
 
 interface NavbarProps {
-  user: UserAccount | null;
   onOpenAuth: (mode?: "login" | "signup") => void;
   onOpenBuy: () => void;
-  onLogout: () => void;
   onCopyAddress?: (addr: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  user,
   onOpenAuth,
   onOpenBuy,
-  onLogout,
   onCopyAddress,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const location = useLocation();
+  const user = useUserStore((state) => state.user);
+
+  // Mutations
+  const logoutMutation = useMutation({
+    mutationFn: () => api.post("/auth/logout"),
+    onSuccess: () => {
+      useUserStore.getState().clearUser();
+      Cookies.remove("accessToken");
+    },
+  });
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (user?.address) {
-      navigator.clipboard.writeText(user.address);
+    if (user?.wallet_address) {
+      navigator.clipboard.writeText(user.wallet_address);
       setCopied(true);
-      if (onCopyAddress) onCopyAddress(user.address);
+      if (onCopyAddress) onCopyAddress(user.wallet_address);
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -190,7 +208,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <div className="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></div>
                 <span className="text-xs font-mono text-cyan-300 font-medium">
-                  {truncateAddress(user.address)}
+                  {truncateAddress(user.wallet_address)}
                 </span>
                 {copied ? (
                   <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -200,11 +218,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
 
               <button
-                onClick={onLogout}
+                onClick={() => logoutMutation.mutate()}
+                disabled={logoutMutation.isPending}
                 title="Disconnect EVM Session"
-                className="p-1.5 sm:p-2 rounded-lg bg-slate-800/80 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 text-slate-400 transition-colors cursor-pointer shrink-0 hidden sm:block"
+                className="p-1.5 sm:p-2 rounded-lg bg-slate-800/80 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 text-slate-400 transition-colors cursor-pointer shrink-0 hidden sm:block disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                {logoutMutation.isPending ? (
+                  <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                ) : (
+                  <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                )}
               </button>
             </div>
           ) : (
@@ -313,16 +336,27 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="pt-3 border-t border-slate-800 flex items-center justify-between px-1">
               <div className="font-mono text-xs text-cyan-300 flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
-                {truncateAddress(user.address)}
+                {truncateAddress(user.wallet_address)}
               </div>
               <button
+                disabled={logoutMutation.isPending}
                 onClick={() => {
-                  onLogout();
+                  logoutMutation.mutate();
                   setMobileMenuOpen(false);
                 }}
-                className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer"
+                className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <LogOut className="w-3.5 h-3.5" /> Disconnect
+                {logoutMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Disconnecting...
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="w-3.5 h-3.5" />
+                    Disconnect
+                  </>
+                )}
               </button>
             </div>
           )}

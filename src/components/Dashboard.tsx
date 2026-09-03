@@ -48,9 +48,9 @@ import {
   ExternalLink,
   ShieldCheck,
 } from "lucide-react";
+import { useUserStore } from "../store/useUserStore";
 
 interface DashboardProps {
-  user: UserAccount;
   transactions: Transaction[];
   onOpenBuy: (amount?: number, coupon?: AppliedCoupon | null) => void;
   onLogout: () => void;
@@ -64,7 +64,6 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
-  user,
   transactions,
   onOpenBuy,
   onLogout,
@@ -74,6 +73,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const user = useUserStore((state) => state.user);
 
   // Clipboard states
   const [copiedRef, setCopiedRef] = useState(false);
@@ -83,14 +83,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   // Withdraw modal state
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-  const [withdrawAddress, setWithdrawAddress] = useState(user.address);
+  const [withdrawAddress, setWithdrawAddress] = useState(user?.wallet_address);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
 
   // Sync withdraw address when user changes
   useEffect(() => {
-    setWithdrawAddress(user.address);
-  }, [user.address]);
+    setWithdrawAddress(user?.wallet_address);
+  }, [user?.wallet_address]);
 
   // ==============================
   // 1. TRANSACTION HISTORY FILTERS & PAGINATION
@@ -175,60 +175,36 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }
   };
 
-  const totalRefMIND =
-    user.referralEarningsMIND ||
-    referralsList.reduce((acc, curr) => acc + curr.bonusEarnedMIND, 0);
+  const totalRefMIND = 0;
 
   // ==============================
   // 3. PROFILE FORM STATE
   // ==============================
   const [profileName, setProfileName] = useState(
-    user.name || "Alexander Wright",
+    user?.name || "Alexander Wright",
   );
   const [profileEmail, setProfileEmail] = useState(
-    user.email || "alexander.wright@mindchain.io",
+    user?.email || "alexander.wright@mindchain.io",
   );
   const [profileAddress, setProfileAddress] = useState(
-    user.physicalAddress ||
+    user?.address ||
       "742 Evergreen Terrace, Suite 400, Austin, TX 78701, United States",
   );
-  const [profilePhone, setProfilePhone] = useState(
-    user.phone || "+1 (512) 555-0198",
-  );
+  const [profilePhone, setProfilePhone] = useState("+1 (512) 555-0198");
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Keep state updated if user prop updates
   useEffect(() => {
-    if (user.name) setProfileName(user.name);
-    if (user.email) setProfileEmail(user.email);
-    if (user.physicalAddress) setProfileAddress(user.physicalAddress);
-    if (user.phone) setProfilePhone(user.phone);
+    if (user?.name) setProfileName(user.name);
+    if (user?.email) setProfileEmail(user.email);
+    if (user?.address) setProfileAddress(user.address);
+    if (user?.phone) setProfilePhone(user.phone);
   }, [user]);
 
-  const handleProfileSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSavingProfile(true);
-
-    setTimeout(() => {
-      const updated: UserAccount = {
-        ...user,
-        name: profileName.trim(),
-        email: profileEmail.trim(),
-        physicalAddress: profileAddress.trim(),
-        phone: profilePhone.trim(),
-      };
-      onUpdateUser(updated);
-      setIsSavingProfile(false);
-      onShowToast(
-        "Profile Updated Successfully",
-        "Your account details have been securely saved.",
-        "success",
-      );
-    }, 600);
-  };
+  const handleProfileSave = (e: React.FormEvent) => {};
 
   // Referral link
-  const referralLink = `https://mindchain.info/ref?id=${user.address.toLowerCase()}`;
+  const referralLink = `https://mindchain.info/ref?id=${user?.wallet_address.toLowerCase()}`;
 
   const handleCopyReferral = () => {
     navigator.clipboard.writeText(referralLink);
@@ -238,9 +214,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   const handleCopyAddress = () => {
-    navigator.clipboard.writeText(user.address);
+    navigator.clipboard.writeText(user?.wallet_address || "");
     setCopiedAddr(true);
-    onShowToast("Wallet Address Copied", user.address, "info");
+    onShowToast("Wallet Address Copied", user?.wallet_address, "info");
     setTimeout(() => setCopiedAddr(false), 2000);
   };
 
@@ -252,48 +228,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   // Withdraw submit
-  const handleWithdrawSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setWithdrawError(null);
-    const num = parseFloat(withdrawAmount) || 0;
-
-    if (num < 50) {
-      setWithdrawError("Minimum withdrawal amount is 50 MIND");
-      return;
-    }
-
-    if (num > user.balanceMIND) {
-      setWithdrawError("Amount exceeds current available balance");
-      return;
-    }
-
-    const updatedUser: UserAccount = {
-      ...user,
-      balanceMIND: user.balanceMIND - num,
-    };
-    onUpdateUser(updatedUser);
-
-    const generatedOrderId = `MND-WTH-${Math.floor(100000 + Math.random() * 900000)}`;
-    const tx: Transaction = {
-      id: `tx-${Date.now()}`,
-      orderId: generatedOrderId,
-      type: "withdraw",
-      amountMIND: num,
-      amountUSD: num * MIND_PRICE_USD,
-      txHash: generateTxHash(),
-      timestamp: "Just now",
-      status: "processing",
-      note: `Withdrawal to ${truncateAddress(withdrawAddress)}`,
-    };
-    onAddTransaction(tx);
-    setShowWithdrawModal(false);
-    setWithdrawAmount("");
-    onShowToast(
-      "Withdrawal Initiated",
-      `Dispatched ${formatNumber(num)} MIND [${generatedOrderId}] to ${truncateAddress(withdrawAddress)}`,
-      "info",
-    );
-  };
+  const handleWithdrawSubmit = (e: React.FormEvent) => {};
 
   // Determine current active subroute
   const currentPath = location.pathname;
@@ -382,12 +317,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </div>
                 <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
-                  {formatNumber(user.balanceMIND)}{" "}
+                  {formatNumber(Number(user?.mind_balance))}{" "}
                   <span className="text-cyan-400 text-sm">MIND</span>
                 </p>
                 <div className="flex items-center justify-between mt-1">
                   <p className="text-xs text-emerald-400 font-mono font-bold">
-                    ≈ {formatUSD(user.balanceMIND * MIND_PRICE_USD)} USD
+                    ≈ {formatUSD(Number(user?.mind_balance) * MIND_PRICE_USD)}{" "}
+                    USD
                   </p>
                   <button
                     onClick={() => setShowWithdrawModal(true)}
@@ -409,7 +345,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </div>
                 <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
-                  {formatUSD(user.totalDepositedUSD)}
+                  {formatUSD(0)}
                 </p>
                 <p className="text-xs text-emerald-400 font-mono mt-1 font-bold">
                   USDT (BEP-20) + Bonus Credited
@@ -432,8 +368,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </p>
                 <div className="flex items-center justify-between mt-1">
                   <p className="text-xs text-amber-400 font-mono font-bold">
-                    ≈ {formatUSD(totalRefMIND * MIND_PRICE_USD)} USD (
-                    {user.referralsCount} Invites)
+                    ≈ {formatUSD(totalRefMIND * MIND_PRICE_USD)} USD ({0}{" "}
+                    Invites)
                   </p>
                   <NavLink
                     to="/dashboard/referrals"
@@ -615,7 +551,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     Total Referrals
                   </p>
                   <p className="text-2xl font-black text-white font-mono mt-1">
-                    {user.referralsCount} Users
+                    {0} Users
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5">
                     Active Investors
@@ -1090,7 +1026,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       type="text"
                       readOnly
                       disabled
-                      value={user.address}
+                      value={user?.wallet_address}
                       className="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-3 pl-3 pr-20 text-xs font-mono text-slate-400 cursor-not-allowed select-all"
                     />
                     <button
@@ -1332,7 +1268,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <span className="text-[10px] text-slate-400 font-mono">
                     Available:{" "}
                     <strong className="text-cyan-400">
-                      {formatNumber(user.balanceMIND)} MIND
+                      {formatNumber(Number(user?.mind_balance))} MIND
                     </strong>
                   </span>
                 </div>
@@ -1342,7 +1278,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     step="any"
                     required
                     min="50"
-                    max={user.balanceMIND}
+                    max={Number(user?.mind_balance)}
                     value={withdrawAmount}
                     onChange={(e) => setWithdrawAmount(e.target.value)}
                     placeholder="Min. 50 MIND"
@@ -1351,7 +1287,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <button
                     type="button"
                     onClick={() =>
-                      setWithdrawAmount(user.balanceMIND.toString())
+                      setWithdrawAmount(Number(user?.mind_balance).toString())
                     }
                     className="absolute right-2 text-[10px] font-mono font-bold px-2 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded cursor-pointer"
                   >
@@ -1392,7 +1328,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </button>
                 <button
                   type="submit"
-                  disabled={user.balanceMIND < 50}
+                  disabled={Number(user?.mind_balance) < 50}
                   className="w-1/2 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-bold rounded-xl disabled:opacity-40 cursor-pointer"
                 >
                   Confirm Withdraw

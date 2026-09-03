@@ -28,20 +28,14 @@ import { EcosystemPage } from "./pages/EcosystemPage";
 import { TokenomicsPage } from "./pages/TokenomicsPage";
 import { Lock, Wallet, Zap, ShieldCheck } from "lucide-react";
 import { ClientProviders } from "./components/ClientProviders";
+import { useUserStore } from "./store/useUserStore";
 
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
 
   // App state
-  const [user, setUser] = useState<UserAccount | null>(() => {
-    try {
-      const saved = localStorage.getItem("mindchain_active_user");
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  const user = useUserStore((state) => state.user);
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
@@ -107,31 +101,9 @@ function AppContent() {
     setIsAuthOpen(true);
   };
 
-  const handleAuthSuccess = (authenticatedUser: UserAccount) => {
-    setUser(authenticatedUser);
-    addToast(
-      "Session Connected",
-      `Authenticated with EVM ID: ${authenticatedUser.address.substring(0, 6)}...${authenticatedUser.address.substring(38)}`,
-      "success",
-    );
-
-    // If user initiated a buy before logging in, proceed to invoice modal
-    if (pendingBuyAmount) {
-      setSelectedBuyAmount(pendingBuyAmount);
-      setSelectedCoupon(pendingCoupon);
-      setIsInvoiceOpen(true);
-      setPendingBuyAmount(null);
-      setPendingCoupon(null);
-    } else {
-      // If current page is not already under /dashboard, navigate to /dashboard
-      if (!location.pathname.startsWith("/dashboard")) {
-        navigate("/dashboard");
-      }
-    }
-  };
+  const handleAuthSuccess = (authenticatedUser: UserAccount) => {};
 
   const handleLogout = () => {
-    setUser(null);
     navigate("/");
     addToast("Disconnected", "Your EVM session has been cleared.", "info");
   };
@@ -165,36 +137,7 @@ function AppContent() {
   const handlePaymentSuccess = (
     invoice: PaymentInvoice,
     completedTx: Transaction,
-  ) => {
-    let targetUser = user;
-    if (!targetUser) {
-      targetUser = {
-        ...INITIAL_USER,
-        balanceMIND: invoice.totalMind,
-        totalDepositedUSD: invoice.usdAmount,
-      };
-      setUser(targetUser);
-    } else {
-      targetUser = {
-        ...targetUser,
-        balanceMIND: targetUser.balanceMIND + invoice.totalMind,
-        totalDepositedUSD: targetUser.totalDepositedUSD + invoice.usdAmount,
-      };
-      setUser(targetUser);
-    }
-
-    // Add transaction to history
-    setTransactions((prev) => [completedTx, ...prev]);
-
-    addToast(
-      "Payment Confirmed!",
-      `Successfully credited ${invoice.totalMind.toFixed(2)} MIND to your wallet`,
-      "success",
-    );
-
-    // Switch to dashboard history or overview
-    navigate("/dashboard/history");
-  };
+  ) => {};
 
   const handleAddTransaction = (newTx: Transaction) => {
     setTransactions((prev) => [newTx, ...prev]);
@@ -209,10 +152,8 @@ function AppContent() {
 
       {/* Main Top Navigation */}
       <Navbar
-        user={user}
         onOpenAuth={handleOpenAuth}
         onOpenBuy={() => handleOpenBuyFlow(100)}
-        onLogout={handleLogout}
         onCopyAddress={(addr) => addToast("Address Copied", addr, "info")}
       />
 
@@ -258,13 +199,12 @@ function AppContent() {
             element={
               user ? (
                 <Dashboard
-                  user={user}
                   transactions={transactions}
                   onOpenBuy={(amount, coupon) =>
                     handleOpenBuyFlow(amount, coupon)
                   }
                   onLogout={handleLogout}
-                  onUpdateUser={(updated) => setUser(updated)}
+                  onUpdateUser={(updated) => {}}
                   onAddTransaction={handleAddTransaction}
                   onShowToast={addToast}
                 />

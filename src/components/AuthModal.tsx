@@ -1,14 +1,13 @@
 import React, { useState } from "react";
+import { User } from "../types/user";
 import { UserAccount } from "../types";
-import {
-  generateRandomEVMAddress,
-  isValidEVMAddress,
-  DEMO_USER_ADDRESS,
-  INITIAL_USER,
-} from "../utils/crypto";
-import { Wallet, Sparkles, Eye, EyeOff, UserCheck, X, Zap } from "lucide-react";
+import { isValidEVMAddress } from "../utils/crypto";
+import { Wallet, Eye, EyeOff, UserCheck, X, Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import api from "../lib/api";
+import { AxiosError } from "axios";
+import Cookies from "js-cookie";
+import { useUserStore } from "../store/useUserStore";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -30,23 +29,67 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [showPin, setShowPin] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loginMutation = useMutation({
-    mutationFn: () => api.post("/auth/login"),
-    onSuccess: () => {},
+  // Mutations
+  const loginMutation = useMutation<
+    {
+      status: boolean;
+      message: string;
+      data: { user: User; token: string };
+    },
+    AxiosError<{ message: string }>
+  >({
+    mutationFn: () =>
+      api
+        .post("/auth/login", {
+          wallet_address: address,
+          password: pin,
+        })
+        .then((res) => res.data),
+    onSuccess: (data) => {
+      Cookies.set("accessToken", data.data.token, {
+        expires: 30,
+        secure: true,
+        sameSite: "lax",
+      });
+      useUserStore.getState().setUser(data.data.user);
+      onClose();
+    },
+    onError: (error) => {
+      setError(error.response?.data.message || error.message);
+    },
+  });
+
+  const signupMutation = useMutation<
+    {
+      status: boolean;
+      message: string;
+      data: { user: User; token: string };
+    },
+    AxiosError<{ message: string }>
+  >({
+    mutationFn: () =>
+      api
+        .post("/auth/register", {
+          wallet_address: address,
+          password: pin,
+          password_confirmation: pin,
+        })
+        .then((res) => res.data),
+    onSuccess: (data) => {
+      Cookies.set("accessToken", data.data.token, {
+        expires: 30,
+        secure: true,
+        sameSite: "lax",
+      });
+      onClose();
+      useUserStore.getState().setUser(data.data.user);
+    },
+    onError: (error) => {
+      setError(error.response?.data.message || error.message);
+    },
   });
 
   if (!isOpen) return null;
-
-  const handleGenerateAddress = () => {
-    const newAddr = generateRandomEVMAddress();
-    setAddress(newAddr);
-    setError(null);
-  };
-
-  const handleQuickDemo = () => {
-    onSuccess(INITIAL_USER);
-    onClose();
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +109,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
 
     if (!pin || pin.length < 4) {
-      setError("Please enter a 4-8 digit Secret PIN for session protection.");
+      setError("Please enter a 8 digit Secret PIN for session protection.");
       return;
     }
 
@@ -80,82 +123,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const lowerAddr = trimmedAddress.toLowerCase();
 
       if (mode === "login") {
-        if (users[lowerAddr]) {
-          if (users[lowerAddr].pin && users[lowerAddr].pin !== pin) {
-            setError("Incorrect PIN for this EVM address.");
-            return;
-          }
-          onSuccess(users[lowerAddr]);
-          onClose();
-          return;
-        } else {
-          // If demo address or first login with no saved pass, authenticate and create session
-          const isDemo = lowerAddr === DEMO_USER_ADDRESS.toLowerCase();
-          const newUser: UserAccount = {
-            address: trimmedAddress,
-            pin,
-            name: isDemo ? "Alexander Wright" : "Web3 Investor",
-            email: isDemo ? "alexander.wright@mindchain.io" : "",
-            physicalAddress: isDemo
-              ? "742 Evergreen Terrace, Suite 400, Austin, TX 78701, United States"
-              : "",
-            phone: isDemo ? "+1 (512) 555-0198" : "",
-            balanceMIND: isDemo ? 5432.8 : 0,
-            totalDepositedUSD: isDemo ? 1750.0 : 0,
-            referralsCount: isDemo ? 8 : 0,
-            referralEarningsMIND: isDemo ? 1591.47 : 0,
-            referralEarningsUSD: isDemo ? 652.5 : 0,
-            referralCode: `MIND-${trimmedAddress.substring(2, 7).toUpperCase()}`,
-            joinedDate: "August 2026",
-          };
-          users[lowerAddr] = newUser;
-          localStorage.setItem("mindchain_users", JSON.stringify(users));
-          onSuccess(newUser);
-          onClose();
-          return;
-        }
+        loginMutation.mutate();
       } else {
+        signupMutation.mutate();
+
         // Signup
-        const newUser: UserAccount = {
-          address: trimmedAddress,
-          pin,
-          name: "Web3 Pioneer",
-          email: "",
-          physicalAddress: "",
-          phone: "",
-          balanceMIND: 0,
-          totalDepositedUSD: 0,
-          referralsCount: 0,
-          referralEarningsMIND: 0,
-          referralEarningsUSD: 0,
-          referralCode: `MIND-${trimmedAddress.substring(2, 7).toUpperCase()}`,
-          joinedDate: "August 2026",
-        };
-        users[lowerAddr] = newUser;
-        localStorage.setItem("mindchain_users", JSON.stringify(users));
-        onSuccess(newUser);
-        onClose();
+        // const newUser: UserAccount = {
+        //   address: trimmedAddress,
+        //   pin,
+        //   name: "Web3 Pioneer",
+        //   email: "",
+        //   physicalAddress: "",
+        //   phone: "",
+        //   balanceMIND: 0,
+        //   totalDepositedUSD: 0,
+        //   referralsCount: 0,
+        //   referralEarningsMIND: 0,
+        //   referralEarningsUSD: 0,
+        //   referralCode: `MIND-${trimmedAddress.substring(2, 7).toUpperCase()}`,
+        //   joinedDate: "August 2026",
+        // };
+        // users[lowerAddr] = newUser;
+        // localStorage.setItem("mindchain_users", JSON.stringify(users));
+        // onSuccess(newUser);
+        // onClose();
       }
-    } catch (err) {
-      // Fallback
-      const fallbackUser: UserAccount = {
-        address: trimmedAddress,
-        pin,
-        name: "Web3 Pioneer",
-        email: "",
-        physicalAddress: "",
-        phone: "",
-        balanceMIND: 0,
-        totalDepositedUSD: 0,
-        referralsCount: 0,
-        referralEarningsMIND: 0,
-        referralEarningsUSD: 0,
-        referralCode: `MIND-${trimmedAddress.substring(2, 7).toUpperCase()}`,
-        joinedDate: "August 2026",
-      };
-      onSuccess(fallbackUser);
-      onClose();
-    }
+    } catch (err) {}
   };
 
   return (
@@ -239,13 +232,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                   EVM Wallet Address
                 </label>
-                <button
-                  type="button"
-                  onClick={handleGenerateAddress}
-                  className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-mono"
-                >
-                  <Sparkles className="w-3 h-3" /> Auto-Generate
-                </button>
               </div>
 
               <div className="relative flex items-center">
@@ -266,7 +252,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   Secret PIN / Password
                 </label>
                 <span className="text-[10px] text-slate-400 font-mono">
-                  4-8 Digits
+                  8 Digits
                 </span>
               </div>
 
@@ -312,12 +298,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* Submit CTA */}
             <button
               type="submit"
-              className="w-full py-3.5 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs shadow-lg shadow-cyan-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+              disabled={loginMutation.isPending || signupMutation.isPending}
+              className="w-full py-3.5 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs shadow-lg shadow-cyan-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              <UserCheck className="w-4 h-4" />
-              {mode === "login"
-                ? "Authenticate & Enter"
-                : "Complete Registration"}
+              {loginMutation.isPending || signupMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                <>
+                  <UserCheck className="w-4 h-4" />
+                  {mode === "login"
+                    ? "Authenticate & Enter"
+                    : "Complete Registration"}
+                </>
+              )}
             </button>
           </form>
         </div>
