@@ -13,7 +13,7 @@ import {
   PaymentInvoice,
   AppliedCoupon,
 } from "./types";
-import { INITIAL_TRANSACTIONS, INITIAL_USER } from "./utils/crypto";
+import { INITIAL_TRANSACTIONS } from "./utils/crypto";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -27,8 +27,11 @@ import { PresalePage } from "./pages/PresalePage";
 import { EcosystemPage } from "./pages/EcosystemPage";
 import { TokenomicsPage } from "./pages/TokenomicsPage";
 import { Lock, Wallet, Zap, ShieldCheck } from "lucide-react";
-import { ClientProviders } from "./components/ClientProviders";
 import { useUserStore } from "./store/useUserStore";
+import { useQuery } from "@tanstack/react-query";
+import api from "./lib/api";
+import { SiteConfig } from "./types/config";
+import { useLayoutStore } from "./store/useLayoutStore";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -275,11 +278,22 @@ function AppContent() {
 }
 
 export default function App() {
+  const setSiteConfig = useLayoutStore((state) => state.setSiteConfig);
+
+  const { data: config } = useQuery<SiteConfig>({
+    queryKey: ["settings"],
+    queryFn: () => api.get("/settings").then((res) => res.data),
+  });
+
+  useEffect(() => {
+    if (config) {
+      setSiteConfig(config);
+    }
+  }, [config, setSiteConfig]);
+
   return (
     <BrowserRouter>
-      <ClientProviders>
-        <AppContent />
-      </ClientProviders>
+      <AppContent />
     </BrowserRouter>
   );
 }
