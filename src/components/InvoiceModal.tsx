@@ -7,9 +7,10 @@ import {
   calculateMindAmount,
   formatNumber,
   formatUSD,
-  generateTxHash,
 } from "../utils/crypto";
 import { Copy, Check, Clock, ShieldCheck, Loader2, X, Tag } from "lucide-react";
+import QRCode from "react-qr-code";
+import { useUserStore } from "../store/useUserStore";
 
 interface InvoiceModalProps {
   isOpen: boolean;
@@ -29,8 +30,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   const [invoice, setInvoice] = useState<PaymentInvoice | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(900); // 15 mins
-
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const user = useUserStore((state) => state.user);
 
   // Initialize invoice on open
   useEffect(() => {
@@ -155,7 +155,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white uppercase tracking-wider">
-                   Awaiting BEP20 USDT Deposit...
+                    Awaiting BEP20 USDT Deposit...
                   </p>
                   <p className="text-[11px] text-slate-400">
                     Send exactly{" "}
@@ -182,7 +182,10 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
             {/* QR Code Container */}
             <div className="sm:col-span-5 flex flex-col items-center justify-center p-3 bg-slate-950/70 rounded-2xl border border-slate-800">
-              <QRCodeDisplay value={invoice.depositAddress} size={150} />
+              <div className="bg-white p-2 rounded-lg">
+                <QRCode value={user?.wallet_address!} size={150} />
+              </div>
+
               <span className="text-[10px] text-slate-400 font-mono mt-2">
                 Scan with Binance / Trust / Metamask
               </span>
