@@ -62,62 +62,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand / Logo Link to Home with Crisp Web3 Vector Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group shrink-0"
+          className="flex items-center cursor-pointer group shrink-0"
         >
-          <div className="w-8 h-8 sm:w-9 sm:h-9 relative flex items-center justify-center shrink-0">
-            <svg
-              viewBox="0 0 36 36"
-              fill="none"
-              className="w-full h-full transform group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_10px_rgba(6,182,212,0.4)]"
-            >
-              <defs>
-                <linearGradient
-                  id="mndNavGrad"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="100%"
-                >
-                  <stop offset="0%" stopColor="#22d3ee" />
-                  <stop offset="50%" stopColor="#14b8a6" />
-                  <stop offset="100%" stopColor="#10b981" />
-                </linearGradient>
-              </defs>
-              <rect
-                width="36"
-                height="36"
-                rx="10"
-                fill="#0f172a"
-                stroke="url(#mndNavGrad)"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M9 25V11L18 18L27 11V25"
-                stroke="url(#mndNavGrad)"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle cx="18" cy="18" r="2" fill="#38bdf8" />
-              <circle cx="9" cy="11" r="1.5" fill="#34d399" />
-              <circle cx="27" cy="11" r="1.5" fill="#34d399" />
-              <circle cx="9" cy="25" r="1.5" fill="#22d3ee" />
-              <circle cx="27" cy="25" r="1.5" fill="#22d3ee" />
-            </svg>
-          </div>
-          <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1 sm:gap-1.5">
-              <span className="text-sm sm:text-lg font-extrabold tracking-tight text-white group-hover:text-cyan-300 transition-colors">
-                MindChain
-              </span>
-              <span className="bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-[9px] sm:text-[10px] font-black px-1.5 py-0.2 rounded uppercase font-mono shrink-0">
-                L1
-              </span>
-            </div>
-            <span className="text-[9px] text-slate-400 font-mono tracking-wider -mt-0.5 hidden sm:block">
-              EVM LAYER-1
-            </span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="MindChain"
+            className="h-auto w-48 md:w-56 object-contain group-hover:scale-105 transition-transform duration-300"
+          />
         </Link>
 
         {/* Desktop Navigation Links */}
