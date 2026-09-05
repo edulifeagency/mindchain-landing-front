@@ -12,11 +12,13 @@ interface PresalePageProps {
     coupon?: AppliedCoupon | null,
     invoiceId?: string | null,
   ) => void;
+  onOpenAuth?: () => void;
 }
 
 export const PresalePage: React.FC<PresalePageProps> = ({
   isLoggedIn,
   onOpenBuyFlow,
+  onOpenAuth,
 }) => {
   const MIND_PRICE_USD =
     useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
@@ -110,6 +112,7 @@ export const PresalePage: React.FC<PresalePageProps> = ({
               onProceedToPay={(amount, address, coupon, invoiceId) =>
                 onOpenBuyFlow(amount, address, coupon, invoiceId)
               }
+              onOpenAuth={onOpenAuth}
             />
           </div>
 

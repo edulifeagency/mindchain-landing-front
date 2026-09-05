@@ -1,8 +1,12 @@
 import React from "react";
 import { PresaleCalculator } from "./PresaleCalculator";
-import { Zap, ArrowRight, Activity, ArrowUpRight } from "lucide-react";
+import { Zap, ArrowRight, Activity, ArrowUpRight, Loader2 } from "lucide-react";
 
 import { AppliedCoupon } from "../types";
+import { useMutation } from "@tanstack/react-query";
+import { Invoice } from "../types/invoice";
+import { AxiosError } from "axios";
+import api from "../lib/api";
 
 interface HeroProps {
   onBuyClick: (
@@ -11,15 +15,34 @@ interface HeroProps {
     coupon?: AppliedCoupon | null,
     invoiceId?: string | null,
   ) => void;
-  onExploreClick: () => void;
   isLoggedIn?: boolean;
+  onOpenAuth?: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   onBuyClick,
-  onExploreClick,
   isLoggedIn = false,
+  onOpenAuth,
 }) => {
+  const purchaseMutation = useMutation<
+    Invoice,
+    AxiosError<{ message: string }>,
+    number
+  >({
+    mutationFn: (usdt) =>
+      api
+        .post("/purchase", {
+          usdt_amount: usdt,
+        })
+        .then((res) => res.data.data),
+
+    onSuccess: (data, usdt) => {
+      onBuyClick(usdt, data.payment_address, null, data.invoice_id);
+    },
+
+    onError: () => {},
+  });
+
   return (
     <section className="relative overflow-hidden pt-6 pb-12 sm:pt-8 sm:pb-16 lg:pt-12 lg:pb-24 border-b border-slate-800/80">
       {/* Background ambient lighting */}
@@ -72,14 +95,30 @@ export const Hero: React.FC<HeroProps> = ({
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-1 sm:pt-2">
               <button
-                onClick={() => onBuyClick(500, "")}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs sm:text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer min-h-12"
+                onClick={() => {
+                  if (isLoggedIn && !purchaseMutation.isPending) {
+                    purchaseMutation.mutate(100);
+                  }
+
+                  if (!isLoggedIn) {
+                    onOpenAuth?.();
+                  }
+                }}
+                disabled={purchaseMutation.isPending}
+                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs sm:text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer min-h-12 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <Zap className="w-4 h-4 fill-slate-950 shrink-0" />
+                {purchaseMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                ) : (
+                  <Zap className="w-4 h-4 fill-slate-950 shrink-0" />
+                )}
+
                 <span>
-                  {isLoggedIn
-                    ? "Buy with Bonus (USDT BEP-20)"
-                    : "Login & Buy with Bonus"}
+                  {purchaseMutation.isPending
+                    ? "Processing..."
+                    : isLoggedIn
+                      ? "Buy with Bonus (USDT BEP-20)"
+                      : "Login & Buy with Bonus"}
                 </span>
               </button>
 
@@ -139,6 +178,7 @@ export const Hero: React.FC<HeroProps> = ({
               onProceedToPay={(amount, address, coupon, invoiceId) =>
                 onBuyClick(amount, address, coupon, invoiceId)
               }
+              onOpenAuth={onOpenAuth}
             />
           </div>
         </div>

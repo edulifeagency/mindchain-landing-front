@@ -173,7 +173,11 @@ function AppContent() {
           <Route
             path="/"
             element={
-              <HomePage isLoggedIn={!!user} onOpenBuyFlow={handleOpenBuyFlow} />
+              <HomePage
+                isLoggedIn={!!user}
+                onOpenBuyFlow={handleOpenBuyFlow}
+                onOpenAuth={handleOpenAuth}
+              />
             }
           />
           <Route path="/home" element={<Navigate to="/" replace />} />
@@ -185,6 +189,7 @@ function AppContent() {
               <PresalePage
                 isLoggedIn={!!user}
                 onOpenBuyFlow={handleOpenBuyFlow}
+                onOpenAuth={handleOpenAuth}
               />
             }
           />

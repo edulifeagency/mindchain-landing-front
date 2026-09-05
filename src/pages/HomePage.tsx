@@ -12,11 +12,13 @@ interface HomePageProps {
     coupon?: AppliedCoupon | null,
     invoiceId?: string | null,
   ) => void;
+  onOpenAuth?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
   isLoggedIn,
   onOpenBuyFlow,
+  onOpenAuth,
 }) => {
   return (
     <main className="flex-1">
@@ -26,11 +28,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         onBuyClick={(amount, address, coupon, invoiceId) =>
           onOpenBuyFlow(amount, address, coupon, invoiceId)
         }
-        onExploreClick={() => {
-          document
-            .getElementById("ecosystem")
-            ?.scrollIntoView({ behavior: "smooth" });
-        }}
+        onOpenAuth={onOpenAuth}
       />
 
       {/* Ecosystem Grid */}
