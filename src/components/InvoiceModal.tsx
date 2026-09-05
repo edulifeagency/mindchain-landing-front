@@ -54,7 +54,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
   // Payment check query
   const { data: paymentResponse } = useQuery<{
-    payment_status: "pending" | "success";
+    payment_status: "pending" | "completed";
   }>({
     queryKey: ["payment-check", invoiceId],
     queryFn: () =>
@@ -121,7 +121,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
   // Close modal on success
   useEffect(() => {
-    if (paymentResponse?.payment_status === "success") {
+    if (paymentResponse?.payment_status === "completed") {
       onClose();
     }
   }, [paymentResponse]);
