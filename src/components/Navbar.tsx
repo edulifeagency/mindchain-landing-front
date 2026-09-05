@@ -67,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <img
             src="/logo.png"
             alt="MindChain"
-            className="h-auto w-36 md:w-56 object-contain group-hover:scale-105 transition-transform duration-300"
+            className="h-auto w-32 md:w-56 object-contain group-hover:scale-105 transition-transform duration-300"
           />
         </Link>
 
