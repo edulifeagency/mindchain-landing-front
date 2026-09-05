@@ -1,18 +1,7 @@
 import React from "react";
 import { PresaleCalculator } from "../components/PresaleCalculator";
 import { AppliedCoupon } from "../types";
-import {
-  Zap,
-  ShieldCheck,
-  Coins,
-  CheckCircle2,
-  Clock,
-  Sparkles,
-  ArrowRight,
-  TrendingUp,
-  Award,
-} from "lucide-react";
-import { Link } from "react-router-dom";
+import { ShieldCheck, CheckCircle2, Sparkles, Award } from "lucide-react";
 import { useLayoutStore } from "../store/useLayoutStore";
 
 interface PresalePageProps {
@@ -30,6 +19,9 @@ export const PresalePage: React.FC<PresalePageProps> = ({
 }) => {
   const MIND_PRICE_USD =
     useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
+  const purchaseSlots = useLayoutStore(
+    (state) => state.siteConfig?.purchase.purchase_slots,
+  );
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-slate-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -130,45 +122,67 @@ export const PresalePage: React.FC<PresalePageProps> = ({
               </div>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-                  <div>
-                    <p className="text-xs font-bold text-white">
-                      $100 – $499 Deposit
-                    </p>
-                    <p className="text-[10px] text-slate-400">
-                      Standard Pioneer Tier
-                    </p>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-xs font-mono font-bold">
-                    +5% Free MIND
-                  </span>
-                </div>
+                {purchaseSlots?.map((tier) => {
+                  const isLastTier =
+                    tier.slot === purchaseSlots[purchaseSlots.length - 1]?.slot;
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-                  <div>
-                    <p className="text-xs font-bold text-white">
-                      $500 – $999 Deposit
-                    </p>
-                    <p className="text-[10px] text-slate-400">Validator Tier</p>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/30 text-xs font-mono font-bold">
-                    +10% Free MIND
-                  </span>
-                </div>
+                  const tierName =
+                    tier.slot === 1
+                      ? "Standard Pioneer Tier"
+                      : tier.slot === 2
+                        ? "Validator Tier"
+                        : "Whale & Institutional Tier";
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/90 border border-amber-500/30 shadow-lg shadow-amber-500/5">
-                  <div>
-                    <p className="text-xs font-bold text-white">
-                      $1,000+ Deposit
-                    </p>
-                    <p className="text-[10px] text-amber-300/80">
-                      Whale & Institutional Tier
-                    </p>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-mono font-black">
-                    +15% Free MIND
-                  </span>
-                </div>
+                  const tierColors = [
+                    {
+                      badge: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
+                      container: "border-slate-800",
+                      description: "text-slate-400",
+                    },
+                    {
+                      badge: "bg-teal-500/10 text-teal-400 border-teal-500/30",
+                      container: "border-slate-800",
+                      description: "text-slate-400",
+                    },
+                    {
+                      badge:
+                        "bg-amber-500/20 text-amber-300 border-amber-500/40",
+                      container:
+                        "border-amber-500/30 shadow-lg shadow-amber-500/5",
+                      description: "text-amber-300/80",
+                    },
+                  ];
+
+                  const colors = tierColors[tier.slot - 1] ?? tierColors[0];
+
+                  const depositLabel =
+                    tier.max_usd >= 100000
+                      ? `$${tier.min_usd.toLocaleString()}+ Deposit`
+                      : `$${tier.min_usd.toLocaleString()} – $${tier.max_usd.toLocaleString()} Deposit`;
+
+                  return (
+                    <div
+                      key={tier.slot}
+                      className={`flex items-center justify-between p-3 rounded-xl bg-slate-900/90 border ${colors.container}`}
+                    >
+                      <div>
+                        <p className="text-xs font-bold text-white">
+                          {depositLabel}
+                        </p>
+
+                        <p className={`text-[10px] ${colors.description}`}>
+                          {tierName}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`px-2.5 py-1 rounded-lg border text-xs font-mono font-bold ${colors.badge}`}
+                      >
+                        +{tier.bonus_percentage}% Free MIND
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

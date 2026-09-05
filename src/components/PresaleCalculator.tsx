@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  calculateMindAmount,
-  formatNumber,
-  formatUSD,
-  validateCoupon,
-} from "../utils/crypto";
+import { calculateMindAmount, formatNumber, formatUSD } from "../utils/crypto";
 import { AppliedCoupon } from "../types";
 import {
   ArrowDown,
@@ -64,7 +59,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   const bonusMind = (baseMind * bonusPercent) / 100;
   const totalMind = baseMind + bonusMind;
 
-  // Recalculate discount whenever numericUsd changes if coupon is active
+  // MIND calculation always based on original USD, discount only reduces payable amount
   const discountAmount = appliedCoupon
     ? Number(((numericUsd * appliedCoupon.discountPercent) / 100).toFixed(2))
     : 0;
@@ -87,29 +82,6 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
     setCouponError(null);
   };
 
-  const handleApplyCoupon = (codeToApply?: string) => {
-    const targetCode = (codeToApply || couponCodeInput).trim();
-    if (!targetCode) {
-      setCouponError("Please enter a coupon code");
-      setCouponSuccessMsg(null);
-      return;
-    }
-
-    const validated = validateCoupon(targetCode, numericUsd);
-    if (validated) {
-      setAppliedCoupon(validated);
-      setCouponCodeInput(validated.code);
-      setCouponError(null);
-      setCouponSuccessMsg(
-        `${validated.code} applied! You get ${validated.discountPercent}% discount.`,
-      );
-      setIsCouponOpen(true);
-    } else {
-      setCouponError(`Invalid coupon "${targetCode}". Try MIND3 for 3% off.`);
-      setCouponSuccessMsg(null);
-    }
-  };
-
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
     setCouponCodeInput("");
@@ -123,13 +95,45 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   };
 
   // Mutations
+  const couponMutation = useMutation<
+    { coupon_code: string; discount_percentage: number },
+    AxiosError<{ message: string }>,
+    string
+  >({
+    mutationFn: (codeToApply: string) =>
+      api
+        .post("/coupon/validate", { coupon_code: codeToApply })
+        .then((data) => data.data.data),
+    onSuccess: (data) => {
+      const newCoupon: AppliedCoupon = {
+        code: data.coupon_code,
+        discountPercent: data.discount_percentage,
+        description: `${data.discount_percentage}% discount on purchase amount`,
+      };
+      setAppliedCoupon(newCoupon);
+      setCouponCodeInput(data.coupon_code);
+      setCouponError(null);
+      setCouponSuccessMsg(
+        `${data.coupon_code} applied! You get ${data.discount_percentage}% discount.`,
+      );
+      setIsCouponOpen(false);
+    },
+    onError: (error) => {
+      setCouponError(error.response?.data.message || "Invalid coupon code");
+      setCouponSuccessMsg(null);
+    },
+  });
+
   const purchaseMutation = useMutation<
     Invoice,
     AxiosError<{ message: string }>
   >({
     mutationFn: () =>
       api
-        .post("/purchase", { usdt_amount: numericUsd })
+        .post("/purchase", {
+          usdt_amount: numericUsd,
+          ...(appliedCoupon && { coupon_code: appliedCoupon.code }),
+        })
         .then((res) => res.data.data),
     onSuccess: (data) => {
       onProceedToPay(numericUsd, data.payment_address, appliedCoupon);
@@ -291,16 +295,6 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
                       : "Have a Promo / Coupon Code?"}
                   </span>
                 </button>
-
-                {/* Quick 1-click apply suggestion */}
-                <button
-                  type="button"
-                  onClick={() => handleApplyCoupon("MIND3")}
-                  className="px-2.5 py-1 rounded-md bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1"
-                >
-                  <Percent className="w-3 h-3 text-cyan-400 shrink-0" />
-                  Apply MIND3 (-3%)
-                </button>
               </div>
 
               {isCouponOpen && (
@@ -318,19 +312,26 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
-                            handleApplyCoupon();
+                            couponMutation.mutate(couponCodeInput);
                           }
                         }}
-                        placeholder="Enter coupon (e.g. MIND3)"
+                        placeholder="Enter coupon code"
                         className="w-full bg-slate-900 border border-slate-700/90 rounded-lg py-2 pl-9 pr-3 text-xs font-mono uppercase text-white placeholder-slate-500 focus:border-cyan-400 outline-none"
                       />
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleApplyCoupon()}
-                      className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-mono font-black rounded-lg transition-colors cursor-pointer shrink-0"
+                      onClick={() => couponMutation.mutate(couponCodeInput)}
+                      disabled={
+                        couponMutation.isPending || !couponCodeInput.trim()
+                      }
+                      className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 text-xs font-mono font-black rounded-lg transition-colors cursor-pointer shrink-0 flex items-center justify-center gap-2"
                     >
-                      Apply
+                      {couponMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        "Apply"
+                      )}
                     </button>
                   </div>
 
@@ -356,7 +357,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
                       <span className="text-xs font-mono font-black text-white">
                         {appliedCoupon.code}
                       </span>
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold">
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold">
                         {appliedCoupon.discountPercent}% OFF
                       </span>
                     </div>
@@ -379,13 +380,13 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
               {/* Discount Summary Row */}
               <div className="pt-2 border-t border-emerald-500/20 flex items-center justify-between text-xs font-mono">
                 <span className="text-slate-300">
-                  Buy Value:{" "}
+                  Original:{" "}
                   <span className="line-through text-slate-400">
                     {formatUSD(numericUsd)}
                   </span>
                 </span>
                 <span className="text-emerald-400 font-bold">
-                  Discount: -{formatUSD(discountAmount)}
+                  Save: -{formatUSD(discountAmount)}
                 </span>
               </div>
             </div>

@@ -14,8 +14,12 @@ export interface UserAccount {
   joinedDate: string;
 }
 
-export type TransactionType = 'buy' | 'referral' | 'staking_reward' | 'withdraw';
-export type TransactionStatus = 'completed' | 'pending' | 'processing';
+export type TransactionType =
+  | "buy"
+  | "referral"
+  | "staking_reward"
+  | "withdraw";
+export type TransactionStatus = "completed" | "pending" | "processing";
 
 export interface Transaction {
   id: string;
@@ -37,13 +41,13 @@ export interface ReferralRecord {
   joinedDate: string;
   depositUSD: number;
   bonusEarnedMIND: number;
-  status: 'Completed' | 'Pending' | 'Active';
+  status: "Completed" | "Pending" | "Active";
 }
 
 export interface AppliedCoupon {
   code: string;
   discountPercent: number;
-  discountAmountUSD: number;
+  discountAmountUSD?: number;
   description?: string;
 }
 
@@ -59,7 +63,7 @@ export interface PaymentInvoice {
   depositAddress: string;
   network: string;
   token: string;
-  status: 'awaiting_deposit' | 'confirming' | 'confirmed';
+  status: "awaiting_deposit" | "confirming" | "confirmed";
   confirmations: number;
   requiredConfirmations: number;
   createdAt: number;
@@ -75,5 +79,5 @@ export interface EcosystemItem {
   features: string[];
   stats: string;
   badge: string;
-  status: 'Live' | 'Mainnet' | 'Beta' | 'Q3 2026';
+  status: "Live" | "Mainnet" | "Beta" | "Q3 2026";
 }

@@ -104,7 +104,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
   const handleCopyAddress = () => {
     if (invoice?.depositAddress) {
-      navigator.clipboard.writeText(invoice.depositAddress);
+      navigator.clipboard.writeText(address);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -249,8 +249,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
                       Coupon ({invoice.coupon.code}):
                     </span>
                     <span className="font-bold">
-                      -{formatUSD(invoice.coupon.discountAmountUSD)} (-
-                      {invoice.coupon.discountPercent}%)
+                      -{formatUSD(invoice.coupon.discountPercent)}
                     </span>
                   </div>
                 )}
