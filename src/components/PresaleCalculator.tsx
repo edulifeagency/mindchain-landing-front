@@ -24,6 +24,7 @@ interface PresaleCalculatorProps {
     usdAmount: number,
     address: string,
     coupon?: AppliedCoupon | null,
+    invoiceId?: string | null,
   ) => void;
   className?: string;
   isLoggedIn?: boolean;
@@ -136,7 +137,12 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
         })
         .then((res) => res.data.data),
     onSuccess: (data) => {
-      onProceedToPay(numericUsd, data.payment_address, appliedCoupon);
+      onProceedToPay(
+        numericUsd,
+        data.payment_address,
+        appliedCoupon,
+        data.invoice_id,
+      );
     },
     onError: () => {},
   });

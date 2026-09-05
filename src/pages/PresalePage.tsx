@@ -10,6 +10,7 @@ interface PresalePageProps {
     amount: number,
     address: string,
     coupon?: AppliedCoupon | null,
+    invoiceId?: string | null,
   ) => void;
 }
 
@@ -106,7 +107,9 @@ export const PresalePage: React.FC<PresalePageProps> = ({
           <div className="lg:col-span-7">
             <PresaleCalculator
               isLoggedIn={isLoggedIn}
-              onProceedToPay={(amt, coupon) => onOpenBuyFlow(amt, coupon)}
+              onProceedToPay={(amount, address, coupon, invoiceId) =>
+                onOpenBuyFlow(amount, address, coupon, invoiceId)
+              }
             />
           </div>
 

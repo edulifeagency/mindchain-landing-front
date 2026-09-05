@@ -10,6 +10,7 @@ interface HomePageProps {
     amount: number,
     address: string,
     coupon?: AppliedCoupon | null,
+    invoiceId?: string | null,
   ) => void;
 }
 
@@ -22,8 +23,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Hero Section with Live Bonus Calculator */}
       <Hero
         isLoggedIn={isLoggedIn}
-        onBuyClick={(amount, address, coupon) =>
-          onOpenBuyFlow(amount, address, coupon)
+        onBuyClick={(amount, address, coupon, invoiceId) =>
+          onOpenBuyFlow(amount, address, coupon, invoiceId)
         }
         onExploreClick={() => {
           document

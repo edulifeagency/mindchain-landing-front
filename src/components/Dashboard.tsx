@@ -1,12 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import {
-  useLocation,
-  useNavigate,
-  NavLink,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { useLocation, useNavigate, NavLink } from "react-router-dom";
 import {
   UserAccount,
   Transaction,
@@ -19,7 +12,6 @@ import {
   formatNumber,
   formatUSD,
   truncateAddress,
-  generateTxHash,
 } from "../utils/crypto";
 import { PresaleCalculator } from "./PresaleCalculator";
 import {
@@ -32,7 +24,6 @@ import {
   ArrowUpRight,
   Layers,
   Clock,
-  LogOut,
   Search,
   ChevronLeft,
   ChevronRight,
@@ -44,8 +35,6 @@ import {
   Save,
   Hash,
   Sparkles,
-  ExternalLink,
-  ShieldCheck,
 } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
 import { useLayoutStore } from "../store/useLayoutStore";
@@ -56,6 +45,7 @@ interface DashboardProps {
     amount: number,
     address: string,
     coupon?: AppliedCoupon | null,
+    invoiceId?: string | null,
   ) => void;
   onLogout: () => void;
   onUpdateUser: (updatedUser: UserAccount) => void;
@@ -434,7 +424,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div className="lg:col-span-7 space-y-6">
               <PresaleCalculator
                 isLoggedIn={true}
-                onProceedToPay={(amt, coupon) => onOpenBuy(amt, coupon)}
+                onProceedToPay={(amount, address, coupon, invoiceId) =>
+                  onOpenBuy(amount, address, coupon, invoiceId)
+                }
               />
             </div>
 

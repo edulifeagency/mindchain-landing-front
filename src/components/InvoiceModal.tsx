@@ -15,6 +15,7 @@ interface InvoiceModalProps {
   usdAmount: number;
   address: string;
   coupon?: AppliedCoupon | null;
+  invoiceId?: string | null;
   onClose: () => void;
   onPaymentSuccess: (invoice: PaymentInvoice, tx: Transaction) => void;
 }
@@ -24,11 +25,12 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   usdAmount,
   address,
   coupon = null,
+  invoiceId = null,
   onClose,
 }) => {
   const [invoice, setInvoice] = useState<PaymentInvoice | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
-  const [timeLeft, setTimeLeft] = useState<number>(900); // 15 mins
+  const [timeLeft, setTimeLeft] = useState<number>(1200); // 15 mins
   const MIND_PRICE_USD =
     useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 1;
   const purchaseSlots = useLayoutStore(
@@ -68,7 +70,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
       }
 
       const generatedInvoice: PaymentInvoice = {
-        invoiceId: `INV-${Math.floor(100000 + Math.random() * 900000)}`,
+        invoiceId: `INV-${invoiceId ?? Math.floor(100000 + Math.random() * 900000)}`,
         usdAmount: finalPayable,
         originalUsdAmount: originalUsd,
         coupon: activeCoupon,
@@ -83,13 +85,13 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
         confirmations: 0,
         requiredConfirmations: 3,
         createdAt: Date.now(),
-        expiresAt: Date.now() + 15 * 60 * 1000,
+        expiresAt: Date.now() + 20 * 60 * 1000,
       };
 
       setInvoice(generatedInvoice);
-      setTimeLeft(900);
+      setTimeLeft(1200);
     }
-  }, [isOpen, usdAmount, coupon]);
+  }, [isOpen, usdAmount, coupon, invoiceId]);
 
   // Invoice expiration timer
   useEffect(() => {
@@ -122,7 +124,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
       <div className="bg-[#1e293b] border border-slate-700/90 max-w-xl w-full max-h-[92vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden relative text-white my-auto">
         {/* Top Gradient Highlight */}
-        <div className="h-1.5 bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 shrink-0"></div>
+        <div className="h-1.5 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 shrink-0"></div>
 
         {/* Close Button */}
         <button

@@ -9,6 +9,7 @@ interface HeroProps {
     usdAmount: number,
     address: string,
     coupon?: AppliedCoupon | null,
+    invoiceId?: string | null,
   ) => void;
   onExploreClick: () => void;
   isLoggedIn?: boolean;
@@ -135,8 +136,8 @@ export const Hero: React.FC<HeroProps> = ({
           <div className="lg:col-span-5 w-full">
             <PresaleCalculator
               isLoggedIn={isLoggedIn}
-              onProceedToPay={(amount, address, coupon) =>
-                onBuyClick(amount, address, coupon)
+              onProceedToPay={(amount, address, coupon, invoiceId) =>
+                onBuyClick(amount, address, coupon, invoiceId)
               }
             />
           </div>

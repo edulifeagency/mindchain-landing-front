@@ -63,6 +63,7 @@ function AppContent() {
     null,
   );
   const [address, setAddress] = useState<string>("");
+  const [invoiceId, setInvoiceId] = useState<string | null>("");
 
   // Toast notifications
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -116,6 +117,7 @@ function AppContent() {
     amount: number,
     address: string,
     coupon?: AppliedCoupon | null,
+    invoiceId?: string | null,
   ) => {
     const finalAmount = amount || 100;
     const finalCoupon = coupon || null;
@@ -137,6 +139,7 @@ function AppContent() {
     setSelectedBuyAmount(finalAmount);
     setSelectedCoupon(finalCoupon);
     setAddress(address);
+    setInvoiceId(invoiceId || null);
     setIsInvoiceOpen(true);
   };
 
@@ -206,8 +209,8 @@ function AppContent() {
               user ? (
                 <Dashboard
                   transactions={transactions}
-                  onOpenBuy={(amount, address, coupon) =>
-                    handleOpenBuyFlow(amount, address, coupon)
+                  onOpenBuy={(amount, address, coupon, invoiceId) =>
+                    handleOpenBuyFlow(amount, address, coupon, invoiceId)
                   }
                   onLogout={handleLogout}
                   onUpdateUser={(updated) => {}}
@@ -277,6 +280,7 @@ function AppContent() {
         coupon={selectedCoupon}
         onClose={() => setIsInvoiceOpen(false)}
         onPaymentSuccess={handlePaymentSuccess}
+        invoiceId={invoiceId}
       />
     </div>
   );
