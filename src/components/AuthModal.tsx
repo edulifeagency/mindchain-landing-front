@@ -6,6 +6,8 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../lib/api";
 import { AxiosError } from "axios";
 import Cookies from "js-cookie";
+import { User } from "../types/user";
+import { useUserStore } from "../store/useUserStore";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -32,7 +34,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     {
       status: boolean;
       message: string;
-      data: { token: string };
+      data: { user: User; token: string };
     },
     AxiosError<{ message: string }>
   >({
@@ -49,7 +51,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         secure: true,
         sameSite: "lax",
       });
-      location.reload();
+      useUserStore.getState().setUser(data.data.user);
       onClose();
     },
     onError: (error) => {
@@ -61,7 +63,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     {
       status: boolean;
       message: string;
-      data: { token: string };
+      data: { user: User; token: string };
     },
     AxiosError<{ message: string }>
   >({
@@ -79,7 +81,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         secure: true,
         sameSite: "lax",
       });
-      location.reload();
+      useUserStore.getState().setUser(data.data.user);
       onClose();
     },
     onError: (error) => {
