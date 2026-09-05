@@ -73,7 +73,7 @@ export const Footer: React.FC = () => {
               <img
                 src="/logo.png"
                 alt="MindChain"
-                className="h-auto w-36 md:w-48 object-contain group-hover:scale-105 transition-transform duration-300"
+                className="h-auto w-32 md:w-48 object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
