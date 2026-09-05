@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
   Route,
   Navigate,
   useNavigate,
-  useLocation,
 } from "react-router-dom";
 import {
   UserAccount,
@@ -26,16 +25,16 @@ import { HomePage } from "./pages/HomePage";
 import { PresalePage } from "./pages/PresalePage";
 import { EcosystemPage } from "./pages/EcosystemPage";
 import { TokenomicsPage } from "./pages/TokenomicsPage";
-import { Lock, Wallet, Zap, ShieldCheck } from "lucide-react";
+import { Lock, Wallet } from "lucide-react";
 import { useUserStore } from "./store/useUserStore";
 import { useQuery } from "@tanstack/react-query";
 import api from "./lib/api";
 import { SiteConfig } from "./types/config";
 import { useLayoutStore } from "./store/useLayoutStore";
+import { User } from "./types/user";
 
 function AppContent() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   // App state
   const user = useUserStore((state) => state.user);
@@ -62,6 +61,7 @@ function AppContent() {
   const [pendingCoupon, setPendingCoupon] = useState<AppliedCoupon | null>(
     null,
   );
+  const [address, setAddress] = useState<string>("");
 
   // Toast notifications
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -112,7 +112,8 @@ function AppContent() {
   };
 
   const handleOpenBuyFlow = (
-    amount?: number,
+    amount: number,
+    address: string,
     coupon?: AppliedCoupon | null,
   ) => {
     const finalAmount = amount || 100;
@@ -134,6 +135,7 @@ function AppContent() {
 
     setSelectedBuyAmount(finalAmount);
     setSelectedCoupon(finalCoupon);
+    setAddress(address);
     setIsInvoiceOpen(true);
   };
 
@@ -156,7 +158,7 @@ function AppContent() {
       {/* Main Top Navigation */}
       <Navbar
         onOpenAuth={handleOpenAuth}
-        onOpenBuy={() => handleOpenBuyFlow(100)}
+        onOpenBuy={() => handleOpenBuyFlow(100, "")}
         onCopyAddress={(addr) => addToast("Address Copied", addr, "info")}
       />
 
@@ -203,8 +205,8 @@ function AppContent() {
               user ? (
                 <Dashboard
                   transactions={transactions}
-                  onOpenBuy={(amount, coupon) =>
-                    handleOpenBuyFlow(amount, coupon)
+                  onOpenBuy={(amount, address, coupon) =>
+                    handleOpenBuyFlow(amount, address, coupon)
                   }
                   onLogout={handleLogout}
                   onUpdateUser={(updated) => {}}
@@ -228,6 +230,7 @@ function AppContent() {
                         order records.
                       </p>
                     </div>
+                    SiteConfig
                     <div className="space-y-3 pt-2">
                       <button
                         onClick={() => handleOpenAuth("login")}
@@ -269,6 +272,7 @@ function AppContent() {
       <InvoiceModal
         isOpen={isInvoiceOpen}
         usdAmount={selectedBuyAmount}
+        address={address}
         coupon={selectedCoupon}
         onClose={() => setIsInvoiceOpen(false)}
         onPaymentSuccess={handlePaymentSuccess}
@@ -279,6 +283,12 @@ function AppContent() {
 
 export default function App() {
   const setSiteConfig = useLayoutStore((state) => state.setSiteConfig);
+  const setUser = useUserStore((state) => state.setUser);
+
+  const { data: user } = useQuery<User>({
+    queryKey: ["profile"],
+    queryFn: () => api.get("/auth/profile").then((res) => res.data.data.user),
+  });
 
   const { data: config } = useQuery<SiteConfig>({
     queryKey: ["settings"],
@@ -289,7 +299,11 @@ export default function App() {
     if (config) {
       setSiteConfig(config);
     }
-  }, [config, setSiteConfig]);
+
+    if (user) {
+      setUser(user);
+    }
+  }, [config, user, setSiteConfig, setUser]);
 
   return (
     <BrowserRouter>

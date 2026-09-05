@@ -5,7 +5,11 @@ import { Zap, ArrowRight, Activity, ArrowUpRight } from "lucide-react";
 import { AppliedCoupon } from "../types";
 
 interface HeroProps {
-  onBuyClick: (usdAmount?: number, coupon?: AppliedCoupon | null) => void;
+  onBuyClick: (
+    usdAmount: number,
+    address: string,
+    coupon?: AppliedCoupon | null,
+  ) => void;
   onExploreClick: () => void;
   isLoggedIn?: boolean;
 }
@@ -67,7 +71,7 @@ export const Hero: React.FC<HeroProps> = ({
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-1 sm:pt-2">
               <button
-                onClick={() => onBuyClick(500)}
+                onClick={() => onBuyClick(500, "")}
                 className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs sm:text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer min-h-12"
               >
                 <Zap className="w-4 h-4 fill-slate-950 shrink-0" />
@@ -131,7 +135,9 @@ export const Hero: React.FC<HeroProps> = ({
           <div className="lg:col-span-5 w-full">
             <PresaleCalculator
               isLoggedIn={isLoggedIn}
-              onProceedToPay={(amount, coupon) => onBuyClick(amount, coupon)}
+              onProceedToPay={(amount, address, coupon) =>
+                onBuyClick(amount, address, coupon)
+              }
             />
           </div>
         </div>

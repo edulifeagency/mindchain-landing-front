@@ -52,7 +52,11 @@ import { useUserStore } from "../store/useUserStore";
 
 interface DashboardProps {
   transactions: Transaction[];
-  onOpenBuy: (amount?: number, coupon?: AppliedCoupon | null) => void;
+  onOpenBuy: (
+    amount: number,
+    address: string,
+    coupon?: AppliedCoupon | null,
+  ) => void;
   onLogout: () => void;
   onUpdateUser: (updatedUser: UserAccount) => void;
   onAddTransaction: (tx: Transaction) => void;

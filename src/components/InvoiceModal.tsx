@@ -15,6 +15,7 @@ import { useUserStore } from "../store/useUserStore";
 interface InvoiceModalProps {
   isOpen: boolean;
   usdAmount: number;
+  address: string;
   coupon?: AppliedCoupon | null;
   onClose: () => void;
   onPaymentSuccess: (invoice: PaymentInvoice, tx: Transaction) => void;
@@ -23,6 +24,7 @@ interface InvoiceModalProps {
 export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   isOpen,
   usdAmount,
+  address,
   coupon = null,
   onClose,
   onPaymentSuccess,
@@ -30,7 +32,6 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   const [invoice, setInvoice] = useState<PaymentInvoice | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(900); // 15 mins
-  const user = useUserStore((state) => state.user);
 
   // Initialize invoice on open
   useEffect(() => {
@@ -183,7 +184,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
             {/* QR Code Container */}
             <div className="sm:col-span-5 flex flex-col items-center justify-center p-3 bg-slate-950/70 rounded-2xl border border-slate-800">
               <div className="bg-white p-2 rounded-lg">
-                <QRCode value={user?.wallet_address!} size={150} />
+                <QRCode value={address} size={150} />
               </div>
 
               <span className="text-[10px] text-slate-400 font-mono mt-2">
@@ -200,7 +201,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
                 </label>
                 <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-700/80 flex items-center justify-between gap-2">
                   <span className="font-mono text-xs text-cyan-300 break-all select-all font-medium">
-                    {invoice.depositAddress}
+                    {address}
                   </span>
                   <button
                     type="button"

@@ -18,11 +18,20 @@ import {
   X,
   AlertCircle,
   Percent,
+  Loader2,
 } from "lucide-react";
 import { useLayoutStore } from "../store/useLayoutStore";
+import { useMutation } from "@tanstack/react-query";
+import api from "../lib/api";
+import { AxiosError } from "axios";
+import { Invoice } from "../types/invoice";
 
 interface PresaleCalculatorProps {
-  onProceedToPay: (usdAmount: number, coupon?: AppliedCoupon | null) => void;
+  onProceedToPay: (
+    usdAmount: number,
+    address: string,
+    coupon?: AppliedCoupon | null,
+  ) => void;
   className?: string;
   isLoggedIn?: boolean;
 }
@@ -109,9 +118,23 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (numericUsd < 10) return;
-    onProceedToPay(numericUsd, appliedCoupon);
+    purchaseMutation.mutate();
   };
+
+  // Mutations
+  const purchaseMutation = useMutation<
+    Invoice,
+    AxiosError<{ message: string }>
+  >({
+    mutationFn: () =>
+      api
+        .post("/purchase", { usdt_amount: numericUsd })
+        .then((res) => res.data),
+    onSuccess: (data) => {
+      onProceedToPay(numericUsd, data.payment_address, appliedCoupon);
+    },
+    onError: () => {},
+  });
 
   return (
     <div
@@ -383,13 +406,22 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
         {/* Action Button */}
         <button
           type="submit"
-          disabled={numericUsd < 10}
-          className="w-full py-4 bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-black rounded-xl uppercase tracking-widest text-sm shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+          disabled={numericUsd < 1 || purchaseMutation.isPending}
+          className="w-full py-4 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-black rounded-xl uppercase tracking-widest text-sm shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
         >
-          <Zap className="w-4 h-4 fill-slate-950" />
-          {isLoggedIn
-            ? `Buy MIND (${formatUSD(payableUsd)})`
-            : `Sign In & Buy MIND (${formatUSD(payableUsd)})`}
+          {purchaseMutation.isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>
+              <Zap className="w-4 h-4 fill-slate-950" />
+              {isLoggedIn
+                ? `Buy MIND (${formatUSD(payableUsd)})`
+                : `Sign In & Buy MIND (${formatUSD(payableUsd)})`}
+            </>
+          )}
         </button>
 
         {/* Clean trust note */}
