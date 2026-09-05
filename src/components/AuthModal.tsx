@@ -47,7 +47,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         .then((res) => res.data),
     onSuccess: (data) => {
       Cookies.set("accessToken", data.data.token, {
-        expires: 30,
+        expires: 1,
         secure: true,
         sameSite: "lax",
       });
@@ -77,7 +77,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         .then((res) => res.data),
     onSuccess: (data) => {
       Cookies.set("accessToken", data.data.token, {
-        expires: 30,
+        expires: 1,
         secure: true,
         sameSite: "lax",
       });
