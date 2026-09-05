@@ -9,6 +9,8 @@ import {
 import { Copy, Check, Clock, ShieldCheck, Loader2, X, Tag } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useLayoutStore } from "../store/useLayoutStore";
+import { useQuery } from "@tanstack/react-query";
+import api from "../lib/api";
 
 interface InvoiceModalProps {
   isOpen: boolean;
@@ -49,6 +51,19 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   // Calculate final amount with bonus
   const bonusMind = (baseMind * bonusPercent) / 100;
   const totalMind = baseMind + bonusMind;
+
+  // Payment check query
+  const { data: paymentResponse } = useQuery<{
+    payment_status: "pending" | "success";
+  }>({
+    queryKey: ["payment-check", invoiceId],
+    queryFn: () =>
+      api
+        .get(`/purchase/payment-status/${invoiceId}`)
+        .then((res) => res.data.data),
+    refetchInterval: 3000,
+    enabled: isOpen && !!invoiceId,
+  });
 
   // Initialize invoice on open
   useEffect(() => {
@@ -103,6 +118,13 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
     return () => clearInterval(interval);
   }, [isOpen]);
+
+  // Close modal on success
+  useEffect(() => {
+    if (paymentResponse?.payment_status === "success") {
+      onClose();
+    }
+  }, [paymentResponse]);
 
   const handleCopyAddress = () => {
     if (invoice?.depositAddress) {
