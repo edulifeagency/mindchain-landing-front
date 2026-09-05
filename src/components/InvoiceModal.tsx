@@ -26,11 +26,27 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   coupon = null,
   onClose,
 }) => {
-  const MIND_PRICE_USD =
-    useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
   const [invoice, setInvoice] = useState<PaymentInvoice | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(900); // 15 mins
+  const MIND_PRICE_USD =
+    useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 1;
+  const purchaseSlots = useLayoutStore(
+    (state) => state.siteConfig?.purchase.purchase_slots,
+  );
+
+  // Calculate base MIND from USD amount
+  const baseMind = usdAmount / MIND_PRICE_USD;
+
+  // Find applicable slot and get bonus
+  const currentSlot = purchaseSlots?.find(
+    (s) => usdAmount >= s.min_usd && usdAmount <= s.max_usd,
+  );
+  const bonusPercent = currentSlot?.bonus_percentage ?? 0;
+
+  // Calculate final amount with bonus
+  const bonusMind = (baseMind * bonusPercent) / 100;
+  const totalMind = baseMind + bonusMind;
 
   // Initialize invoice on open
   useEffect(() => {
@@ -267,7 +283,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
                     Total MIND Credited:
                   </span>
                   <span className="text-cyan-300 font-black text-sm">
-                    {formatNumber(invoice.totalMind)} MIND
+                    {formatNumber(totalMind)} MIND
                   </span>
                 </div>
               </div>

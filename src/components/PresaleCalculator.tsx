@@ -130,7 +130,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
     mutationFn: () =>
       api
         .post("/purchase", { usdt_amount: numericUsd })
-        .then((res) => res.data),
+        .then((res) => res.data.data),
     onSuccess: (data) => {
       onProceedToPay(numericUsd, data.payment_address, appliedCoupon);
     },
