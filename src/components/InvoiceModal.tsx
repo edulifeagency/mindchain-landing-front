@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { QRCodeDisplay } from "./QRCodeDisplay";
 import { PaymentInvoice, Transaction, AppliedCoupon } from "../types";
 import {
   DEFAULT_DEPOSIT_ADDRESS,
-  MIND_PRICE_USD,
   calculateMindAmount,
   formatNumber,
   formatUSD,
 } from "../utils/crypto";
 import { Copy, Check, Clock, ShieldCheck, Loader2, X, Tag } from "lucide-react";
 import QRCode from "react-qr-code";
-import { useUserStore } from "../store/useUserStore";
+import { useLayoutStore } from "../store/useLayoutStore";
 
 interface InvoiceModalProps {
   isOpen: boolean;
@@ -27,8 +25,9 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   address,
   coupon = null,
   onClose,
-  onPaymentSuccess,
 }) => {
+  const MIND_PRICE_USD =
+    useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
   const [invoice, setInvoice] = useState<PaymentInvoice | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(900); // 15 mins

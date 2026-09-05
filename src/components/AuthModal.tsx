@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { User } from "../types/user";
 import { UserAccount } from "../types";
 import { isValidEVMAddress } from "../utils/crypto";
 import { Wallet, Eye, EyeOff, UserCheck, X, Loader2 } from "lucide-react";
@@ -7,7 +6,6 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../lib/api";
 import { AxiosError } from "axios";
 import Cookies from "js-cookie";
-import { useUserStore } from "../store/useUserStore";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -34,7 +32,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     {
       status: boolean;
       message: string;
-      data: { user: User; token: string };
+      data: { token: string };
     },
     AxiosError<{ message: string }>
   >({
@@ -51,7 +49,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         secure: true,
         sameSite: "lax",
       });
-      useUserStore.getState().setUser(data.data.user);
+      location.reload();
       onClose();
     },
     onError: (error) => {
@@ -63,7 +61,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     {
       status: boolean;
       message: string;
-      data: { user: User; token: string };
+      data: { token: string };
     },
     AxiosError<{ message: string }>
   >({
@@ -81,8 +79,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         secure: true,
         sameSite: "lax",
       });
+      location.reload();
       onClose();
-      useUserStore.getState().setUser(data.data.user);
     },
     onError: (error) => {
       setError(error.response?.data.message || error.message);

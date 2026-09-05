@@ -15,7 +15,6 @@ import {
   TransactionType,
 } from "../types";
 import {
-  MIND_PRICE_USD,
   INITIAL_REFERRALS,
   formatNumber,
   formatUSD,
@@ -49,6 +48,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
+import { useLayoutStore } from "../store/useLayoutStore";
 
 interface DashboardProps {
   transactions: Transaction[];
@@ -75,6 +75,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onAddTransaction,
   onShowToast,
 }) => {
+  const MIND_PRICE_USD =
+    useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
   const location = useLocation();
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { MIND_PRICE_USD, truncateAddress } from "../utils/crypto";
+import { truncateAddress } from "../utils/crypto";
 import {
   Layers,
   LogOut,
@@ -15,6 +15,7 @@ import { useUserStore } from "../store/useUserStore";
 import { useMutation } from "@tanstack/react-query";
 import api from "../lib/api";
 import Cookies from "js-cookie";
+import { useLayoutStore } from "../store/useLayoutStore";
 
 interface NavbarProps {
   onOpenAuth: (mode?: "login" | "signup") => void;
@@ -27,6 +28,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenBuy,
   onCopyAddress,
 }) => {
+  const MIND_PRICE_USD =
+    useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const location = useLocation();

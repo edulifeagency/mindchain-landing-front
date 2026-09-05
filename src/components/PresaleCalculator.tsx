@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {
-  MIND_PRICE_USD,
   calculateMindAmount,
   formatNumber,
   formatUSD,
   validateCoupon,
-  ACTIVE_COUPONS,
 } from "../utils/crypto";
 import { AppliedCoupon } from "../types";
 import {
@@ -41,6 +39,9 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   className = "",
   isLoggedIn = false,
 }) => {
+  const MIND_PRICE_USD = useLayoutStore(
+    (state) => state.siteConfig?.mind.mind_price,
+  );
   const [usdInput, setUsdInput] = useState<string>("100");
   const [couponCodeInput, setCouponCodeInput] = useState<string>("");
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
@@ -141,7 +142,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
       className={`bg-[#131d31] border border-slate-700/80 rounded-2xl p-6 sm:p-7 shadow-2xl backdrop-blur-xl relative ${className}`}
     >
       {/* Sleek top highlight bar */}
-      <div className="absolute top-0 left-6 right-6 h-0.5 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400"></div>
+      <div className="absolute top-0 left-6 right-6 h-0.5 bg-linear-to-r from-cyan-400 via-teal-300 to-emerald-400"></div>
 
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-800/80">

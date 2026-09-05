@@ -1,7 +1,6 @@
 import React from "react";
 import { PresaleCalculator } from "../components/PresaleCalculator";
 import { AppliedCoupon } from "../types";
-import { MIND_PRICE_USD } from "../utils/crypto";
 import {
   Zap,
   ShieldCheck,
@@ -14,6 +13,7 @@ import {
   Award,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLayoutStore } from "../store/useLayoutStore";
 
 interface PresalePageProps {
   isLoggedIn: boolean;
@@ -28,6 +28,9 @@ export const PresalePage: React.FC<PresalePageProps> = ({
   isLoggedIn,
   onOpenBuyFlow,
 }) => {
+  const MIND_PRICE_USD =
+    useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
+
   return (
     <div className="min-h-screen bg-[#0f172a] text-slate-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-12">

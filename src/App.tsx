@@ -32,6 +32,7 @@ import api from "./lib/api";
 import { SiteConfig } from "./types/config";
 import { useLayoutStore } from "./store/useLayoutStore";
 import { User } from "./types/user";
+import Cookies from "js-cookie";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -288,6 +289,7 @@ export default function App() {
   const { data: user } = useQuery<User>({
     queryKey: ["profile"],
     queryFn: () => api.get("/auth/profile").then((res) => res.data.data.user),
+    enabled: !!Cookies.get("accessToken"),
   });
 
   const { data: config } = useQuery<SiteConfig>({
