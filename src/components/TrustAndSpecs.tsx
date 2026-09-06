@@ -22,7 +22,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     question: 'Why should I buy MIND through this official platform portal?',
     answer:
-      'This portal is the official liquidity and ecosystem channel offering exclusive bonus incentives (up to +15% extra MIND tokens depending on your deposit tier). You receive instant, direct credit to your EVM address with zero slippage and verified smart contract delivery.',
+      'This portal is the official liquidity and ecosystem channel offering exclusive bonus incentives (up to +3% extra MIND tokens depending on your deposit tier). You receive instant, direct credit to your EVM address with zero slippage and verified smart contract delivery.',
     badge: 'Bonus Advantage',
   },
   {
