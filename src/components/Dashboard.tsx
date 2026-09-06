@@ -41,6 +41,7 @@ import { useLayoutStore } from "../store/useLayoutStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "../lib/api";
 import { Meta, Trans } from "../types/transaction";
+import { AxiosError } from "axios";
 
 interface DashboardProps {
   transactions: Transaction[];
@@ -200,7 +201,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [profileName, setProfileName] = useState(user?.name || "");
   const [profileEmail, setProfileEmail] = useState(user?.email || "");
   const [profileAddress, setProfileAddress] = useState(user?.address || "");
-  const [profileSuccess, setProfileSuccess] = useState<boolean>(false);
 
   // Keep state updated if user prop updates
   useEffect(() => {
@@ -210,7 +210,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   }, [user]);
 
   // Mutations
-  const profileMutation = useMutation({
+  const profileMutation = useMutation<
+    void,
+    AxiosError<{ message: string }>,
+    void
+  >({
     mutationFn: () =>
       api.post("/auth/profile/update", {
         name: profileName,
@@ -219,7 +223,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
       }),
 
     onSuccess: () => {
-      setProfileSuccess(true);
+      onShowToast(
+        "Successfully Saved",
+        "Your information has been successfully saved.",
+        "success",
+      );
+    },
+    onError: (error) => {
+      onShowToast(
+        "Something went wrong",
+        error.response?.data.message || error.message,
+        "error",
+      );
     },
   });
 
@@ -233,9 +248,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const referralLink = `https://mindchain.info/ref?id=${user?.wallet_address.toLowerCase()}`;
 
   const handleCopyReferral = () => {
-    navigator.clipboard.writeText(referralLink);
+    navigator.clipboard.writeText(user?.referral_code || "");
     setCopiedRef(true);
-    onShowToast("Referral Link Copied", referralLink, "success");
+    onShowToast("Referral Link Copied", user?.referral_code, "success");
     setTimeout(() => setCopiedRef(false), 2000);
   };
 
@@ -594,7 +609,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     Total Bonus Earned
                   </p>
                   <p className="text-2xl font-black text-amber-400 font-mono mt-1">
-                    +{formatNumber(totalRefMIND)}{" "}
+                    +{formatNumber(Number(user?.referral_bonus.mind))}{" "}
                     <span className="text-sm">MIND</span>
                   </p>
                   <p className="text-[11px] text-emerald-400 font-mono mt-0.5">
@@ -618,15 +633,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
               {/* Referral link copy box */}
               <div className="pt-2">
                 <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                  Your Unique Referral Link
+                  Your Referral Code
                 </label>
+
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     readOnly
-                    value={referralLink}
+                    value={user?.referral_code || ""}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl py-2.5 px-3 text-xs font-mono text-cyan-300 outline-none select-all"
                   />
+
                   <button
                     onClick={handleCopyReferral}
                     className="px-4 py-2.5 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
@@ -1089,23 +1106,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </p>
                 </div>
               </div>
-
-              {profileSuccess && (
-                <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-                    <Check className="w-4 h-4" />
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-bold">
-                      Profile updated successfully
-                    </p>
-                    <p className="text-xs text-emerald-400/70 mt-0.5">
-                      Your profile details have been saved.
-                    </p>
-                  </div>
-                </div>
-              )}
 
               <form onSubmit={handleProfileSave} className="space-y-5">
                 {/* 1. Wallet Address (Locked / Disabled) */}
