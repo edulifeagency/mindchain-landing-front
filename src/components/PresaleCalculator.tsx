@@ -50,7 +50,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   const purchaseSlots = useLayoutStore(
     (state) => state.siteConfig?.purchase.purchase_slots,
   );
-  const minUsd = purchaseSlots?.[0]?.min_usd || 10;
+  const minUsd = purchaseSlots?.[0]?.min_usd || 1;
   const maxUsd = purchaseSlots?.[purchaseSlots.length - 1]?.max_usd || 5000;
 
   const numericUsd = parseFloat(usdInput) || 0;
