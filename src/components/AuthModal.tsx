@@ -96,7 +96,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     const trimmedAddress = address.trim();
     if (!trimmedAddress) {
-      setError("Please enter your EVM Wallet Address");
+      setError("Please enter your MIND Wallet (Metamask/Trust Wallet)");
       return;
     }
 
@@ -229,7 +229,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div>
               <div className="flex justify-between items-center mb-1.5 px-1">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  EVM Wallet Address
+                  MIND Wallet (Metamask/Trust Wallet)
                 </label>
               </div>
 

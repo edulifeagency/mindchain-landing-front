@@ -1,5 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useLocation, useNavigate, NavLink, data } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  NavLink,
+  data,
+  Link,
+} from "react-router-dom";
 import {
   UserAccount,
   Transaction,
@@ -35,6 +41,8 @@ import {
   Save,
   Hash,
   Sparkles,
+  ExternalLink,
+  ArrowLeft,
 } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
 import { useLayoutStore } from "../store/useLayoutStore";
@@ -87,6 +95,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
     "all",
   );
   const [txStatusFilter, setTxStatusFilter] = useState<string>("all");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
   // Query
   const [txPage, setTxPage] = useState(1);
@@ -239,10 +250,52 @@ export const Dashboard: React.FC<DashboardProps> = ({
     },
   });
 
+  const passwordMutation = useMutation<
+    void,
+    AxiosError<{ message: string }>,
+    void
+  >({
+    mutationFn: () =>
+      api.post("/auth/change-password", {
+        current_password: currentPassword,
+        password,
+        password_confirmation: password,
+      }),
+
+    onSuccess: () => {
+      onShowToast(
+        "Successfully Saved",
+        "Your password has been successfully changed.",
+        "success",
+      );
+      setCurrentPassword("");
+      setPassword("");
+      setPasswordConfirmation("");
+    },
+    onError: (error) => {
+      onShowToast(
+        "Something went wrong",
+        error.response?.data.message || error.message,
+        "error",
+      );
+    },
+  });
+
   const handleProfileSave = (e: React.FormEvent) => {
     e.preventDefault();
 
     profileMutation.mutate();
+  };
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password !== passwordConfirmation) {
+      onShowToast("Password doesn't match");
+      return;
+    }
+
+    passwordMutation.mutate();
   };
 
   // Referral link
@@ -280,6 +333,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const isReferrals = currentPath.startsWith("/dashboard/referrals");
   const isHistory = currentPath.startsWith("/dashboard/history");
   const isProfile = currentPath.startsWith("/dashboard/profile");
+  const isPassChange = currentPath.startsWith("/dashboard/change-password");
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-slate-200">
@@ -1163,6 +1217,121 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       <>
                         <Save className="w-4 h-4" />
                         Save Profile Details
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              <div className="flex justify-end">
+                <Link
+                  to="/dashboard/change-password"
+                  className="text-cyan-400 transition-colors flex items-center gap-2"
+                >
+                  Change Password <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isPassChange && (
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="bg-[#1e293b]/60 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Lock className="w-5 h-5 text-cyan-400" />
+                    Change Password
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Update your account password. Make sure your new password is
+                    strong and secure.
+                  </p>
+                </div>
+
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                  <Lock className="w-5 h-5" />
+                </div>
+              </div>
+
+              <form onSubmit={handlePasswordChange} className="space-y-5">
+                {/* Current Password */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-cyan-400" />
+                    Current Password
+                  </label>
+
+                  <input
+                    type="password"
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter your current password"
+                    className="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl py-2.5 px-3 text-xs text-white placeholder-slate-500 outline-none transition-colors"
+                  />
+                </div>
+
+                {/* New Password */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-cyan-400" />
+                    New Password
+                  </label>
+
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your new password"
+                    className="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl py-2.5 px-3 text-xs text-white placeholder-slate-500 outline-none transition-colors"
+                  />
+                </div>
+
+                {/* Password Confirmation */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-cyan-400" />
+                    Confirm New Password
+                  </label>
+
+                  <input
+                    type="password"
+                    required
+                    value={passwordConfirmation}
+                    onChange={(e) => setPasswordConfirmation(e.target.value)}
+                    placeholder="Confirm your new password"
+                    className="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl py-2.5 px-3 text-xs text-white placeholder-slate-500 outline-none transition-colors"
+                  />
+                </div>
+
+                {/* Submit */}
+                <div className="pt-2 flex items-center justify-between gap-3">
+                  <div className="flex">
+                    <Link
+                      to="/dashboard/profile"
+                      className="text-cyan-400 transition-colors flex items-center gap-2"
+                    >
+                      <ArrowLeft className="w-3 h-3" /> Back
+                    </Link>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={passwordMutation.isPending}
+                    className="px-6 py-2.5 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 disabled:opacity-50 transition-all cursor-pointer"
+                  >
+                    {passwordMutation.isPending ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                        Updating Password...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Update Password
                       </>
                     )}
                   </button>

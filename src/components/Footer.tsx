@@ -172,13 +172,15 @@ export const Footer: React.FC = () => {
               </div>
 
               {/* Badge 3: EVM Native */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 font-mono text-[11px]">
-                <FileCode2 className="w-3.5 h-3.5 text-cyan-400" />
-                <span className="text-slate-400">Chain:</span>
-                <strong className="text-cyan-300 font-bold">
-                  EVM Layer-1 (9982)
-                </strong>
-              </div>
+              <a href="https://chainlist.org/chain/9996" target="_blank">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 font-mono text-[11px]">
+                  <FileCode2 className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="text-slate-400">Chain:</span>
+                  <strong className="text-cyan-300 font-bold">
+                    EVM Layer-1 (9996)
+                  </strong>
+                </div>
+              </a>
 
               {/* Badge 4: BEP-20 USDT Gateway */}
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 font-mono text-[11px]">

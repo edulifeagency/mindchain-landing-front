@@ -83,7 +83,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "85,000+ Downloads",
     badge: "Mobile & Web",
     status: "Live",
-    link: "#",
+    link: "https://mindwallet.app",
   },
   {
     id: "explorer",
@@ -101,7 +101,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "18.4M+ Blocks Indexed",
     badge: "Open API",
     status: "Live",
-    link: "https://mainnet.mindscan.info",
+    link: "https://mindscan.info",
   },
   {
     id: "academy",
@@ -119,7 +119,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "$5M Grant Fund",
     badge: "Grants Open",
     status: "Live",
-    link: "#",
+    link: "https://academy.mindchain.info",
   },
 ];
 
