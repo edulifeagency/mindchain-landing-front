@@ -50,6 +50,8 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   const purchaseSlots = useLayoutStore(
     (state) => state.siteConfig?.purchase.purchase_slots,
   );
+  const minUsd = purchaseSlots?.[0]?.min_usd || 10;
+  const maxUsd = purchaseSlots?.[purchaseSlots.length - 1]?.max_usd || 5000;
 
   const numericUsd = parseFloat(usdInput) || 0;
   const { baseMind } = calculateMindAmount(numericUsd);
@@ -419,7 +421,11 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
         {/* Action Button */}
         <button
           type="submit"
-          disabled={numericUsd < 0.01 || purchaseMutation.isPending}
+          disabled={
+            numericUsd < minUsd ||
+            numericUsd > maxUsd ||
+            purchaseMutation.isPending
+          }
           className="w-full py-4 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-black rounded-xl uppercase tracking-widest text-sm shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
         >
           {purchaseMutation.isPending ? (
