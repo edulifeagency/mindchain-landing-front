@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useLocation, useNavigate, NavLink } from "react-router-dom";
+import { useLocation, useNavigate, NavLink, data } from "react-router-dom";
 import {
   UserAccount,
   Transaction,
@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
 import { useLayoutStore } from "../store/useLayoutStore";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "../lib/api";
 import { Meta, Trans } from "../types/transaction";
 
@@ -68,7 +68,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const MIND_PRICE_USD =
     useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
   const location = useLocation();
-  const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
 
   // Clipboard states
@@ -198,28 +197,37 @@ export const Dashboard: React.FC<DashboardProps> = ({
   // ==============================
   // 3. PROFILE FORM STATE
   // ==============================
-  const [profileName, setProfileName] = useState(
-    user?.name || "Alexander Wright",
-  );
-  const [profileEmail, setProfileEmail] = useState(
-    user?.email || "alexander.wright@mindchain.io",
-  );
-  const [profileAddress, setProfileAddress] = useState(
-    user?.address ||
-      "742 Evergreen Terrace, Suite 400, Austin, TX 78701, United States",
-  );
-  const [profilePhone, setProfilePhone] = useState("+1 (512) 555-0198");
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileName, setProfileName] = useState(user?.name || "");
+  const [profileEmail, setProfileEmail] = useState(user?.email || "");
+  const [profileAddress, setProfileAddress] = useState(user?.address || "");
+  const [profileSuccess, setProfileSuccess] = useState<boolean>(false);
 
   // Keep state updated if user prop updates
   useEffect(() => {
     if (user?.name) setProfileName(user.name);
     if (user?.email) setProfileEmail(user.email);
     if (user?.address) setProfileAddress(user.address);
-    if (user?.phone) setProfilePhone(user.phone);
   }, [user]);
 
-  const handleProfileSave = (e: React.FormEvent) => {};
+  // Mutations
+  const profileMutation = useMutation({
+    mutationFn: () =>
+      api.post("/auth/profile/update", {
+        name: profileName,
+        email: profileEmail,
+        address: profileAddress,
+      }),
+
+    onSuccess: () => {
+      setProfileSuccess(true);
+    },
+  });
+
+  const handleProfileSave = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    profileMutation.mutate();
+  };
 
   // Referral link
   const referralLink = `https://mindchain.info/ref?id=${user?.wallet_address.toLowerCase()}`;
@@ -814,7 +822,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       key={filter.id}
                       onClick={() => {
                         setTxTypeFilter(filter.id as any);
-                        setTxPage(1)
+                        setTxPage(1);
                       }}
                       className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer text-xs ${
                         txTypeFilter === filter.id
@@ -1082,6 +1090,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               </div>
 
+              {profileSuccess && (
+                <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                    <Check className="w-4 h-4" />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-bold">
+                      Profile updated successfully
+                    </p>
+                    <p className="text-xs text-emerald-400/70 mt-0.5">
+                      Your profile details have been saved.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <form onSubmit={handleProfileSave} className="space-y-5">
                 {/* 1. Wallet Address (Locked / Disabled) */}
                 <div>
@@ -1165,30 +1190,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       className="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl py-2.5 px-3 text-xs text-white placeholder-slate-500 outline-none transition-colors"
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-cyan-400" />
-                      Phone / Telegram Contact
-                    </label>
-                    <input
-                      type="text"
-                      value={profilePhone}
-                      onChange={(e) => setProfilePhone(e.target.value)}
-                      placeholder="+1 (555) 000-0000"
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl py-2.5 px-3 text-xs text-white placeholder-slate-500 outline-none transition-colors"
-                    />
-                  </div>
                 </div>
 
                 {/* Submit button */}
                 <div className="pt-2 flex items-center justify-end gap-3">
                   <button
                     type="submit"
-                    disabled={isSavingProfile}
+                    disabled={profileMutation.isPending}
                     className="px-6 py-2.5 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 disabled:opacity-50 transition-all cursor-pointer"
                   >
-                    {isSavingProfile ? (
+                    {profileMutation.isPending ? (
                       <>
                         <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
                         Saving Changes...
