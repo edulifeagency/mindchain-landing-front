@@ -305,13 +305,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
             },
             {
               to: "/dashboard/referrals",
-              label: "Referral Rewards (+15% MIND)",
+              label: "Referral Rewards",
               icon: Users,
               end: false,
             },
             {
               to: "/dashboard/history",
-              label: `Transaction History (${transactions.length})`,
+              label: `Transaction History`,
               icon: Clock,
               end: false,
             },
