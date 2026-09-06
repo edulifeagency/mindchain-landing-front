@@ -70,6 +70,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 0;
   const location = useLocation();
   const user = useUserStore((state) => state.user);
+  const config = useLayoutStore((state) => state.siteConfig);
 
   // Clipboard states
   const [copiedRef, setCopiedRef] = useState(false);
@@ -622,7 +623,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     Commission Rate
                   </p>
                   <p className="text-2xl font-black text-cyan-400 font-mono mt-1">
-                    15.00%
+                    {Number(config?.referral_commission || 0).toFixed(2)}%
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5">
                     Instant Payout in MIND
