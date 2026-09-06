@@ -689,7 +689,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       <th className="py-2.5 px-3">Joined Date</th>
                       <th className="py-2.5 px-3 text-amber-400">MIND Bonus</th>
                       <th className="py-2.5 px-3 text-emerald-400">
-                        USDT Bonus
+                        USDT Value
                       </th>
                       <th className="py-2.5 px-3 text-right">Status</th>
                     </tr>
@@ -706,7 +706,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         </td>
                       </tr>
                     ) : (
-                      (user?.referral_users || []).map((ref) => (
+                      (user?.referral_users || []).map((ref, idx) => (
                         <tr
                           key={ref.id}
                           className="hover:bg-slate-800/30 transition-colors"
@@ -714,7 +714,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           {/* Referral ID */}
                           <td className="py-3 px-3">
                             <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300 font-bold text-[11px]">
-                              #{ref.id}
+                              REF-${idx + 1}
                             </span>
                           </td>
 
@@ -736,12 +736,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           {/* MIND Bonus */}
                           <td className="py-3 px-3 font-bold text-amber-400">
                             +{formatNumber(ref.referral_bonus.mind)} MIND
-                            <span className="block text-[10px] text-emerald-400 font-normal">
-                              ≈{" "}
-                              {formatUSD(
-                                ref.referral_bonus.mind * MIND_PRICE_USD,
-                              )}
-                            </span>
                           </td>
 
                           {/* USDT Bonus */}
