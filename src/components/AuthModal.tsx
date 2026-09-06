@@ -7,7 +7,6 @@ import api from "../lib/api";
 import { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { User } from "../types/user";
-import { useUserStore } from "../store/useUserStore";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -20,7 +19,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   initialMode = "login",
   onClose,
-  onSuccess,
 }) => {
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
   const [address, setAddress] = useState<string>("");
@@ -51,7 +49,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         secure: true,
         sameSite: "lax",
       });
-      useUserStore.getState().setUser(data.data.user);
+      location.replace("/");
       onClose();
     },
     onError: (error) => {
@@ -82,7 +80,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         secure: true,
         sameSite: "lax",
       });
-      useUserStore.getState().setUser(data.data.user);
+      location.replace("/");
       onClose();
     },
     onError: (error) => {
