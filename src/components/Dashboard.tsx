@@ -246,7 +246,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   // Referral link
-  const referralLink = `https://mindchain.info/ref?id=${user?.wallet_address.toLowerCase()}`;
+  const referralLink = `https://${window.location.host}/ref?id=${user?.referral_code}`;
 
   const handleCopyReferral = () => {
     navigator.clipboard.writeText(user?.referral_code || "");
@@ -432,15 +432,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <span className="px-2.5 py-0.5 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/30 text-[10px] font-extrabold uppercase tracking-wider font-mono flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-amber-400" />
-                    +15% Instant MIND Coin Bonus
+                    {config?.referral_commission?.referral_bonus_percentage}%
+                    Instant MIND Coin Bonus
                   </span>
                 </div>
                 <h3 className="text-lg font-extrabold text-white">
                   Share Your Affiliate Link & Earn Free MIND Coins
                 </h3>
                 <p className="text-xs text-slate-300 max-w-xl">
-                  Earn an immediate 15% bonus in MIND Coins for every
-                  contributor who purchases MIND through your referral link.
+                  Earn an immediate{" "}
+                  {config?.referral_commission?.referral_bonus_percentage}%
+                  bonus in MIND Coins for every contributor who purchases MIND
+                  through your referral link.
                 </p>
               </div>
 
@@ -582,8 +585,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       MindChain Affiliate & Referral Program
                     </h3>
                     <p className="text-xs text-slate-400">
-                      Earn a 15% instant commission rewarded directly in MIND
-                      Coins for every contributor who participates.
+                      Earn a{" "}
+                      {config?.referral_commission?.referral_bonus_percentage}%
+                      instant commission rewarded directly in MIND Coins for
+                      every contributor who participates.
                     </p>
                   </div>
                 </div>
@@ -645,7 +650,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <input
                     type="text"
                     readOnly
-                    value={user?.referral_code || ""}
+                    value={referralLink}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl py-2.5 px-3 text-xs font-mono text-cyan-300 outline-none select-all"
                   />
 

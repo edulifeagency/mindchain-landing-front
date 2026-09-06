@@ -80,4 +80,5 @@ export interface EcosystemItem {
   stats: string;
   badge: string;
   status: "Live" | "Mainnet" | "Beta" | "Q3 2026";
+  link?: string;
 }

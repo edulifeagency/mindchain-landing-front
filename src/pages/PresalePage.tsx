@@ -45,7 +45,7 @@ export const PresalePage: React.FC<PresalePageProps> = ({
             Acquire native MindChain Layer-1 coins at the early-access fixed
             rate of{" "}
             <strong className="text-emerald-400 font-mono">
-              ${MIND_PRICE_USD} USD
+              ${MIND_PRICE_USD} USDT
             </strong>
             . Receive tier bonuses up to +
             {purchaseSlots?.[purchaseSlots.length - 1]?.bonus_percentage ?? 0}%
@@ -60,7 +60,7 @@ export const PresalePage: React.FC<PresalePageProps> = ({
               Current Price
             </span>
             <p className="text-2xl font-black text-emerald-400 font-mono mt-1">
-              ${MIND_PRICE_USD} USD
+              ${MIND_PRICE_USD} USDT
             </p>
             <span className="text-[10px] text-slate-500 font-mono">
               Guaranteed Floor
@@ -211,7 +211,7 @@ export const PresalePage: React.FC<PresalePageProps> = ({
                   </span>
                   <div>
                     <p className="font-bold text-white">
-                      Select USD Deposit Amount
+                      Select USDT Deposit Amount
                     </p>
                     <p className="text-slate-400 text-[11px] mt-0.5">
                       Input desired amount or choose a quick preset to instantly

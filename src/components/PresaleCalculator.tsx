@@ -176,7 +176,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
         <div className="text-right">
           <p className="text-[10px] uppercase font-mono text-slate-400">Rate</p>
           <p className="text-sm font-black text-cyan-400 font-mono">
-            1 MIND = ${MIND_PRICE_USD} USD
+            1 MIND = ${MIND_PRICE_USD} USDT
           </p>
         </div>
       </div>
@@ -187,7 +187,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
         <div>
           <div className="flex justify-between items-center mb-1.5 px-0.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-300 font-mono">
-              Buy Amount (USD)
+              Buy Amount (USDT)
             </label>
             <span className="text-[11px] font-mono text-slate-400">
               Min: $10

@@ -241,7 +241,7 @@ export const Footer: React.FC = () => {
               rel="noreferrer"
               className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 hover:underline"
             >
-              mindchain.info <ExternalLink className="w-3 h-3" />
+              Mindchain CEX <ExternalLink className="w-3 h-3" />
             </a>
           </div>
 
@@ -283,7 +283,10 @@ export const Footer: React.FC = () => {
             </span>
           </div>
 
-          <div>&copy; 2026 MindChain Ecosystem. All Rights Reserved.</div>
+          <div>
+            &copy; {new Date().getFullYear()} MindChain Ecosystem. All Rights
+            Reserved.
+          </div>
         </div>
       </div>
     </footer>

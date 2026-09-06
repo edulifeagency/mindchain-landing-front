@@ -29,6 +29,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "$48.2M 24h Volume",
     badge: "Flagship Core",
     status: "Live",
+    link: "https://mindchain.info",
   },
   {
     id: "dex",
@@ -46,6 +47,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "$14.6M Total Value Locked",
     badge: "High Yield",
     status: "Live",
+    link: "https://mindchainswap.finance",
   },
   {
     id: "defi",
@@ -63,6 +65,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "$9.2M Active Borrows",
     badge: "Audited",
     status: "Live",
+    link: "https://mindchainwallet.com",
   },
   {
     id: "wallet",
@@ -80,6 +83,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "85,000+ Downloads",
     badge: "Mobile & Web",
     status: "Live",
+    link: "#",
   },
   {
     id: "explorer",
@@ -97,6 +101,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "18.4M+ Blocks Indexed",
     badge: "Open API",
     status: "Live",
+    link: "https://mainnet.mindscan.info",
   },
   {
     id: "academy",
@@ -114,6 +119,7 @@ const ECOSYSTEM_ITEMS: EcosystemItem[] = [
     stats: "$5M Grant Fund",
     badge: "Grants Open",
     status: "Live",
+    link: "#",
   },
 ];
 
@@ -223,10 +229,16 @@ export const EcosystemGrid: React.FC<EcosystemGridProps> = ({
                 <span className="font-mono text-slate-300 font-bold">
                   {item.stats}
                 </span>
-                <span className="text-cyan-400 group-hover:text-cyan-300 font-bold flex items-center gap-1">
-                  Details{" "}
-                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </span>
+                <a
+                  href={item.link}
+                  target="_blank"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="text-cyan-400 group-hover:text-cyan-300 font-bold flex items-center gap-1">
+                    Browse{" "}
+                    <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
+                </a>
               </div>
             </div>
           ))}
