@@ -412,7 +412,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <p className="text-xs text-amber-400 font-mono font-bold">
                     ≈{" "}
                     {formatUSD(
-                      Number(user?.referral_bonus.mind) * MIND_PRICE_USD,
+                      Number(user?.referral_bonus?.mind || 0) * MIND_PRICE_USD,
                     )}{" "}
                     USD ({0} Invites)
                   </p>
@@ -623,7 +623,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     Commission Rate
                   </p>
                   <p className="text-2xl font-black text-cyan-400 font-mono mt-1">
-                    {Number(config?.referral_commission || 0).toFixed(2)}%
+                    {Number(
+                      config?.referral_commission?.referral_bonus_percentage ||
+                        0,
+                    ).toFixed(2)}
+                    %
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5">
                     Instant Payout in MIND

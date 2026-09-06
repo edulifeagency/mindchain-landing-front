@@ -10,7 +10,7 @@ export interface SiteConfig {
   purchase: {
     purchase_slots: PurchaseSlot[];
   };
-  referral_commission: number;
+  referral_commission: { referral_bonus_percentage: number };
 }
 
 export interface PurchaseSlot {

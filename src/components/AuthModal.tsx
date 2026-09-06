@@ -73,6 +73,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           wallet_address: address,
           password: pin,
           password_confirmation: pin,
+          referral_code: referralCode,
         })
         .then((res) => res.data),
     onSuccess: (data) => {
