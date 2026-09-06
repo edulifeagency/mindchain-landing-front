@@ -13,4 +13,7 @@ export interface User {
   role: "user" | string;
   created_at: string;
   updated_at: string;
+
+  total_referral?: number;
+  referral_users: [];
 }
