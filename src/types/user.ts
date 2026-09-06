@@ -1,3 +1,14 @@
+interface ReferralUser {
+  id: number;
+  wallet_address: string;
+  name?: string;
+  referral_bonus: {
+    mind: number;
+    usdt: number;
+  };
+  created_at: string;
+}
+
 export interface User {
   id: number;
   wallet_address: string;
@@ -15,5 +26,5 @@ export interface User {
   updated_at: string;
 
   total_referral?: number;
-  referral_users: [];
+  referral_users: ReferralUser[];
 }

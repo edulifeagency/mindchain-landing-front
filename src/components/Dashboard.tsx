@@ -598,7 +598,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     Total Referrals
                   </p>
                   <p className="text-2xl font-black text-white font-mono mt-1">
-                    {0} Users
+                    {user?.total_referral || 0} Users
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5">
                     Active Investors
@@ -670,27 +670,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <div>
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
                     <Users className="w-4 h-4 text-cyan-400" />
-                    Referred Investors List ({filteredReferrals.length})
+                    Referred Investors List ({user?.total_referral || 0})
                   </h3>
                   <p className="text-xs text-slate-400">
                     Comprehensive audit of all investors referred with real-time
                     MIND Coin distributions.
                   </p>
-                </div>
-
-                {/* Search in Referral List */}
-                <div className="relative w-full sm:w-64">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={refSearchQuery}
-                    onChange={(e) => {
-                      setRefSearchQuery(e.target.value);
-                      setRefCurrentPage(1);
-                    }}
-                    placeholder="Search Order ID, Name..."
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 font-mono outline-none focus:border-cyan-400"
-                  />
                 </div>
               </div>
 
@@ -699,18 +684,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <table className="w-full text-left text-xs font-mono min-w-162.5">
                   <thead className="text-[10px] text-slate-400 font-bold uppercase border-b border-slate-800 bg-slate-900/50">
                     <tr>
-                      <th className="py-2.5 px-3">Order / Ref ID</th>
+                      <th className="py-2.5 px-3">Referral ID</th>
                       <th className="py-2.5 px-3">Referred Investor</th>
                       <th className="py-2.5 px-3">Joined Date</th>
-                      <th className="py-2.5 px-3">Deposit Amount</th>
-                      <th className="py-2.5 px-3 text-amber-400">
-                        Bonus in MIND (+15%)
+                      <th className="py-2.5 px-3 text-amber-400">MIND Bonus</th>
+                      <th className="py-2.5 px-3 text-emerald-400">
+                        USDT Bonus
                       </th>
                       <th className="py-2.5 px-3 text-right">Status</th>
                     </tr>
                   </thead>
+
                   <tbody className="divide-y divide-slate-800/60">
-                    {paginatedReferrals.length === 0 ? (
+                    {(user?.referral_users || []).length === 0 ? (
                       <tr>
                         <td
                           colSpan={6}
@@ -720,40 +706,53 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         </td>
                       </tr>
                     ) : (
-                      paginatedReferrals.map((ref) => (
+                      (user?.referral_users || []).map((ref) => (
                         <tr
                           key={ref.id}
                           className="hover:bg-slate-800/30 transition-colors"
                         >
+                          {/* Referral ID */}
                           <td className="py-3 px-3">
                             <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300 font-bold text-[11px]">
-                              {ref.orderId}
+                              #{ref.id}
                             </span>
                           </td>
+
+                          {/* Wallet Address */}
                           <td className="py-3 px-3">
                             <p className="text-white font-bold">
-                              {ref.referredUserName || "Anonymous Web3 User"}
+                              {ref.name || "Anonymous Web3 User"}
                             </p>
                             <p className="text-[10px] text-slate-400">
-                              {truncateAddress(ref.referredUserAddress, 8, 6)}
+                              {truncateAddress(ref.wallet_address, 8, 6)}
                             </p>
                           </td>
+
+                          {/* Joined Date */}
                           <td className="py-3 px-3 text-slate-300">
-                            {ref.joinedDate}
+                            {new Date(ref.created_at).toLocaleDateString()}
                           </td>
-                          <td className="py-3 px-3 text-white font-bold">
-                            {formatUSD(ref.depositUSD)}
-                          </td>
+
+                          {/* MIND Bonus */}
                           <td className="py-3 px-3 font-bold text-amber-400">
-                            +{formatNumber(ref.bonusEarnedMIND)} MIND
+                            +{formatNumber(ref.referral_bonus.mind)} MIND
                             <span className="block text-[10px] text-emerald-400 font-normal">
                               ≈{" "}
-                              {formatUSD(ref.bonusEarnedMIND * MIND_PRICE_USD)}
+                              {formatUSD(
+                                ref.referral_bonus.mind * MIND_PRICE_USD,
+                              )}
                             </span>
                           </td>
+
+                          {/* USDT Bonus */}
+                          <td className="py-3 px-3 font-bold text-emerald-400">
+                            +{formatNumber(ref.referral_bonus.usdt)} USDT
+                          </td>
+
+                          {/* Status */}
                           <td className="py-3 px-3 text-right">
                             <span className="px-2 py-0.5 rounded text-[10px] uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
-                              {ref.status}
+                              Active
                             </span>
                           </td>
                         </tr>
@@ -762,54 +761,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </tbody>
                 </table>
               </div>
-
-              {/* Referral Pagination Controls */}
-              {totalRefPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800 text-xs font-mono">
-                  <span className="text-slate-400">
-                    Showing {(refCurrentPage - 1) * refPerPage + 1} to{" "}
-                    {Math.min(
-                      refCurrentPage * refPerPage,
-                      filteredReferrals.length,
-                    )}{" "}
-                    of {filteredReferrals.length} referrals
-                  </span>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => handleRefPageChange(refCurrentPage - 1)}
-                      disabled={refCurrentPage === 1}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
-                    >
-                      <ChevronLeft className="w-3.5 h-3.5" /> Prev
-                    </button>
-
-                    {Array.from({ length: totalRefPages }, (_, i) => i + 1).map(
-                      (pageNum) => (
-                        <button
-                          key={pageNum}
-                          onClick={() => handleRefPageChange(pageNum)}
-                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                            refCurrentPage === pageNum
-                              ? "bg-cyan-500 text-slate-950"
-                              : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      ),
-                    )}
-
-                    <button
-                      onClick={() => handleRefPageChange(refCurrentPage + 1)}
-                      disabled={refCurrentPage === totalRefPages}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
-                    >
-                      Next <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
