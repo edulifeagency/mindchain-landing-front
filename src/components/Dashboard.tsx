@@ -38,6 +38,9 @@ import {
 } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
 import { useLayoutStore } from "../store/useLayoutStore";
+import { useQuery } from "@tanstack/react-query";
+import api from "../lib/api";
+import { Meta, Trans } from "../types/transaction";
 
 interface DashboardProps {
   transactions: Transaction[];
@@ -60,9 +63,6 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({
   transactions,
   onOpenBuy,
-  onLogout,
-  onUpdateUser,
-  onAddTransaction,
   onShowToast,
 }) => {
   const MIND_PRICE_USD =
@@ -82,6 +82,33 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [withdrawAddress, setWithdrawAddress] = useState(user?.wallet_address);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
+  const [txTypeFilter, setTxTypeFilter] = useState<"all" | TransactionType>(
+    "all",
+  );
+  const [txStatusFilter, setTxStatusFilter] = useState<string>("all");
+
+  // Query
+  const [txPage, setTxPage] = useState(1);
+
+  const { data: trxResponse, isFetching: isFetchingTrx } = useQuery<{
+    data: Trans[];
+    pagination: Meta;
+  }>({
+    queryKey: ["transactions", txPage, txTypeFilter, txStatusFilter],
+    queryFn: () =>
+      api
+        .get("/transactions/history", {
+          params: {
+            page: txPage,
+            per_page: 10,
+            ...(txTypeFilter &&
+              txTypeFilter !== "all" && { type: txTypeFilter }),
+            ...(txStatusFilter &&
+              txStatusFilter !== "all" && { status: txStatusFilter }),
+          },
+        })
+        .then((res) => res.data),
+  });
 
   // Sync withdraw address when user changes
   useEffect(() => {
@@ -92,10 +119,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   // 1. TRANSACTION HISTORY FILTERS & PAGINATION
   // ==============================
   const [txSearchQuery, setTxSearchQuery] = useState("");
-  const [txTypeFilter, setTxTypeFilter] = useState<"all" | TransactionType>(
-    "all",
-  );
-  const [txStatusFilter, setTxStatusFilter] = useState<string>("all");
+
   const [txCurrentPage, setTxCurrentPage] = useState(1);
   const txPerPage = 6;
 
@@ -130,10 +154,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return filteredTransactions.slice(startIndex, startIndex + txPerPage);
   }, [filteredTransactions, txCurrentPage, txPerPage]);
 
-  const handleTxPageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalTxPages) {
-      setTxCurrentPage(newPage);
-    }
+  const handleTxPageChange = (page: number) => {
+    setTxPage(page);
   };
 
   // ==============================
@@ -341,7 +363,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </div>
                 <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
-                  {formatUSD(0)}
+                  {formatUSD(Number(user?.total_usd_balance))}
                 </p>
                 <p className="text-xs text-emerald-400 font-mono mt-1 font-bold">
                   USDT (BEP-20) + Bonus Credited
@@ -359,13 +381,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </div>
                 <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
-                  {formatNumber(totalRefMIND)}{" "}
+                  {formatNumber(Number(user?.referral_bonus.mind))}{" "}
                   <span className="text-amber-400 text-sm">MIND</span>
                 </p>
                 <div className="flex items-center justify-between mt-1">
                   <p className="text-xs text-amber-400 font-mono font-bold">
-                    ≈ {formatUSD(totalRefMIND * MIND_PRICE_USD)} USD ({0}{" "}
-                    Invites)
+                    ≈{" "}
+                    {formatUSD(
+                      Number(user?.referral_bonus.mind) * MIND_PRICE_USD,
+                    )}{" "}
+                    USD ({0} Invites)
                   </p>
                   <NavLink
                     to="/dashboard/referrals"
@@ -777,34 +802,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
               {/* Filters Container */}
               <div className="flex flex-wrap items-center gap-2.5">
-                {/* Search by Order ID / Hash */}
-                <div className="relative w-full sm:w-56">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={txSearchQuery}
-                    onChange={(e) => {
-                      setTxSearchQuery(e.target.value);
-                      setTxCurrentPage(1);
-                    }}
-                    placeholder="Search Order ID, Hash..."
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 font-mono outline-none focus:border-cyan-400"
-                  />
-                </div>
-
                 {/* Filter by Type */}
                 <div className="flex items-center gap-1 bg-slate-950 border border-slate-700 rounded-xl p-1 text-xs">
                   {[
                     { id: "all", label: "All" },
-                    { id: "buy", label: "Buy" },
-                    { id: "referral", label: "Referral" },
-                    { id: "withdraw", label: "Withdraw" },
+                    { id: "purchase", label: "Purchase" },
+                    { id: "referral_bonus", label: "Referral" },
+                    { id: "withdrawal", label: "Withdraw" },
                   ].map((filter) => (
                     <button
                       key={filter.id}
                       onClick={() => {
                         setTxTypeFilter(filter.id as any);
-                        setTxCurrentPage(1);
+                        setTxPage(1)
                       }}
                       className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer text-xs ${
                         txTypeFilter === filter.id
@@ -822,13 +832,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   value={txStatusFilter}
                   onChange={(e) => {
                     setTxStatusFilter(e.target.value);
-                    setTxCurrentPage(1);
+                    setTxPage(1);
                   }}
                   className="bg-slate-950 border border-slate-700 text-xs font-mono text-slate-300 rounded-xl px-3 py-2 outline-none cursor-pointer"
                 >
                   <option value="all">All Status</option>
                   <option value="completed">Completed</option>
-                  <option value="processing">Processing</option>
                   <option value="pending">Pending</option>
                 </select>
               </div>
@@ -843,61 +852,102 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <th className="py-3 px-3">Type</th>
                     <th className="py-3 px-3">MIND Amount</th>
                     <th className="py-3 px-3">USD Value</th>
-                    <th className="py-3 px-3">Transaction Hash</th>
+                    <th className="py-3 px-3">Rate Applied</th>
                     <th className="py-3 px-3">Date</th>
                     <th className="py-3 px-3 text-right">Status</th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-slate-800/60">
-                  {paginatedTransactions.length === 0 ? (
+                  {isFetchingTrx ? (
                     <tr>
                       <td
                         colSpan={7}
                         className="py-10 text-center text-slate-500 font-mono"
                       >
-                        No transactions found matching your selected filters.
+                        Loading transactions...
+                      </td>
+                    </tr>
+                  ) : !trxResponse?.data?.length ? (
+                    <tr>
+                      <td
+                        colSpan={7}
+                        className="py-10 text-center text-slate-500 font-mono"
+                      >
+                        No transactions found.
                       </td>
                     </tr>
                   ) : (
-                    paginatedTransactions.map((tx) => (
+                    trxResponse.data.map((tx) => (
                       <tr
                         key={tx.id}
-                        onClick={() => setSelectedTx(tx)}
                         className="hover:bg-slate-800/30 transition-colors cursor-pointer group"
                       >
+                        {/* Order ID */}
                         <td className="py-3.5 px-3">
                           <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-cyan-300 font-bold group-hover:border-cyan-500/50 transition-colors">
-                            {tx.orderId || "MND-ORD-N/A"}
+                            {tx.order_id || "N/A"}
                           </span>
                         </td>
+
+                        {/* Type */}
                         <td className="py-3.5 px-3 font-bold text-white capitalize">
                           <span
                             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
-                              tx.type === "buy"
+                              tx.type === "purchase"
                                 ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
-                                : tx.type === "referral"
+                                : tx.type === "referral_bonus"
                                   ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                                  : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                                  : tx.type === "withdrawal"
+                                    ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                                    : "bg-slate-500/10 text-slate-400 border border-slate-500/20"
                             }`}
                           >
                             {tx.type.replace("_", " ")}
                           </span>
                         </td>
+
+                        {/* MIND Amount */}
                         <td
-                          className={`py-3.5 px-3 font-bold ${tx.type === "withdraw" ? "text-rose-400" : "text-cyan-400"}`}
+                          className={`py-3.5 px-3 font-bold ${
+                            tx.type === "withdrawal"
+                              ? "text-rose-400"
+                              : "text-cyan-400"
+                          }`}
                         >
-                          {tx.type === "withdraw" ? "-" : "+"}
-                          {formatNumber(tx.amountMIND)} MIND
+                          {tx.status !== "completed" ? (
+                            "— MIND"
+                          ) : (
+                            <>
+                              {tx.type === "withdrawal" ? "-" : "+"}
+                              {tx.amount_mind !== null
+                                ? formatNumber(tx.amount_mind)
+                                : "—"}{" "}
+                              MIND
+                            </>
+                          )}
                         </td>
+
+                        {/* USD Value */}
                         <td className="py-3.5 px-3 text-slate-300">
-                          {formatUSD(tx.amountUSD)}
+                          {tx.amount_usdt !== null
+                            ? formatUSD(tx.amount_usdt)
+                            : "—"}
                         </td>
-                        <td className="py-3.5 px-3 text-slate-400 truncate max-w-35">
-                          {truncateAddress(tx.txHash, 8, 6)}
-                        </td>
+
+                        {/* Rate */}
                         <td className="py-3.5 px-3 text-slate-400">
-                          {tx.timestamp}
+                          {tx.rate_applied !== null
+                            ? formatUSD(tx.rate_applied)
+                            : "—"}
                         </td>
+
+                        {/* Date */}
+                        <td className="py-3.5 px-3 text-slate-400 whitespace-nowrap">
+                          {new Date(tx.created_at).toLocaleString()}
+                        </td>
+
+                        {/* Status */}
                         <td className="py-3.5 px-3 text-right">
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
@@ -917,52 +967,77 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             {/* Pagination Controls */}
-            {totalTxPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800 text-xs font-mono">
-                <span className="text-slate-400">
-                  Showing {(txCurrentPage - 1) * txPerPage + 1} to{" "}
-                  {Math.min(
-                    txCurrentPage * txPerPage,
-                    filteredTransactions.length,
-                  )}{" "}
-                  of {filteredTransactions.length} transactions
-                </span>
+            {trxResponse?.pagination &&
+              trxResponse.pagination.last_page > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800 text-xs font-mono">
+                  <span className="text-slate-400">
+                    Showing{" "}
+                    {(trxResponse.pagination.current_page - 1) *
+                      trxResponse.pagination.per_page +
+                      1}{" "}
+                    to{" "}
+                    {Math.min(
+                      trxResponse.pagination.current_page *
+                        trxResponse.pagination.per_page,
+                      trxResponse.pagination.total,
+                    )}{" "}
+                    of {trxResponse.pagination.total} transactions
+                  </span>
 
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => handleTxPageChange(txCurrentPage - 1)}
-                    disabled={txCurrentPage === 1}
-                    className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5" /> Previous
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    {/* Previous */}
+                    <button
+                      onClick={() =>
+                        handleTxPageChange(
+                          trxResponse.pagination.current_page - 1,
+                        )
+                      }
+                      disabled={trxResponse.pagination.current_page === 1}
+                      className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      Previous
+                    </button>
 
-                  {Array.from({ length: totalTxPages }, (_, i) => i + 1).map(
-                    (pageNum) => (
+                    {/* Page Numbers */}
+                    {Array.from(
+                      {
+                        length: trxResponse.pagination.last_page,
+                      },
+                      (_, i) => i + 1,
+                    ).map((pageNum) => (
                       <button
                         key={pageNum}
                         onClick={() => handleTxPageChange(pageNum)}
                         className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                          txCurrentPage === pageNum
+                          trxResponse.pagination.current_page === pageNum
                             ? "bg-cyan-500 text-slate-950"
                             : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
                         }`}
                       >
                         {pageNum}
                       </button>
-                    ),
-                  )}
+                    ))}
 
-                  <button
-                    onClick={() => handleTxPageChange(txCurrentPage + 1)}
-                    disabled={txCurrentPage === totalTxPages}
-                    className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
-                  >
-                    Next <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
+                    {/* Next */}
+                    <button
+                      onClick={() =>
+                        handleTxPageChange(
+                          trxResponse.pagination.current_page + 1,
+                        )
+                      }
+                      disabled={
+                        trxResponse.pagination.current_page ===
+                        trxResponse.pagination.last_page
+                      }
+                      className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
+                    >
+                      Next
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         )}
 

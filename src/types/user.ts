@@ -8,6 +8,8 @@ export interface User {
   referral_code: string;
   referred_id: number | null;
   mind_balance: string;
+  total_usd_balance: string;
+  referral_bonus: { mind: string };
   role: "user" | string;
   created_at: string;
   updated_at: string;
