@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Invoice } from "../types/invoice";
 import { AxiosError } from "axios";
 import api from "../lib/api";
+import { useLayoutStore } from "../store/useLayoutStore";
 
 interface HeroProps {
   onBuyClick: (
@@ -24,6 +25,10 @@ export const Hero: React.FC<HeroProps> = ({
   isLoggedIn = false,
   onOpenAuth,
 }) => {
+  const purchaseSlots = useLayoutStore(
+    (state) => state.siteConfig?.purchase.purchase_slots,
+  );
+
   const purchaseMutation = useMutation<
     Invoice,
     AxiosError<{ message: string }>,
@@ -86,7 +91,10 @@ export const Hero: React.FC<HeroProps> = ({
               blockchain with an active ecosystem. Through this official
               platform portal, buyers receive up to{" "}
               <strong className="text-cyan-300 font-bold">
-                +15% extra bonus MIND tokens
+                +
+                {purchaseSlots?.[purchaseSlots.length - 1]?.bonus_percentage ??
+                  0}
+                % extra bonus MIND tokens
               </strong>
               . All coins can be freely withdrawn and traded or sold on{" "}
               <strong className="text-white">mindchain.info</strong>.

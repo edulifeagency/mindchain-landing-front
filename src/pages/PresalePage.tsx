@@ -47,8 +47,9 @@ export const PresalePage: React.FC<PresalePageProps> = ({
             <strong className="text-emerald-400 font-mono">
               ${MIND_PRICE_USD} USD
             </strong>
-            . Receive tier bonuses up to +15% and automated instant credit to
-            your EVM account.
+            . Receive tier bonuses up to +
+            {purchaseSlots?.[purchaseSlots.length - 1]?.bonus_percentage ?? 0}%
+            and automated instant credit to your EVM account.
           </p>
         </div>
 
@@ -83,7 +84,9 @@ export const PresalePage: React.FC<PresalePageProps> = ({
               Max Bonus Tier
             </span>
             <p className="text-2xl font-black text-amber-400 font-mono mt-1">
-              +15% MIND
+              +
+              {purchaseSlots?.[purchaseSlots.length - 1]?.bonus_percentage ?? 0}
+              % MIND
             </p>
             <span className="text-[10px] text-slate-500 font-mono">
               On $1,000+ Deposits
