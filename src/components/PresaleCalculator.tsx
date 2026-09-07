@@ -190,7 +190,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
               Buy Amount (USDT)
             </label>
             <span className="text-[11px] font-mono text-slate-400">
-              Min: $10
+              Min: ${minUsd}, Max: ${maxUsd}
             </span>
           </div>
 

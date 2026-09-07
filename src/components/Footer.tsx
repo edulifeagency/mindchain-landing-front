@@ -216,27 +216,6 @@ export const Footer: React.FC = () => {
 
           {/* Quick Internal & External Links */}
           <div className="md:col-span-4 flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono">
-            <Link to="/" className="hover:text-cyan-400 transition-colors">
-              Home
-            </Link>
-            <Link
-              to="/presale"
-              className="hover:text-cyan-400 transition-colors flex items-center gap-1"
-            >
-              <Zap className="w-3 h-3 text-cyan-400" /> Presale Terminal
-            </Link>
-            <Link
-              to="/ecosystem"
-              className="hover:text-cyan-400 transition-colors"
-            >
-              Ecosystem Suite
-            </Link>
-            <Link
-              to="/tokenomics"
-              className="hover:text-cyan-400 transition-colors"
-            >
-              L1 Comparison
-            </Link>
             <a
               href="https://mindchain.info"
               target="_blank"
@@ -244,6 +223,22 @@ export const Footer: React.FC = () => {
               className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 hover:underline"
             >
               Mindchain CEX <ExternalLink className="w-3 h-3" />
+            </a>
+            <a
+              href="/mindchain_ecosystem.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 hover:underline"
+            >
+              Whitepaper <ExternalLink className="w-3 h-3" />
+            </a>
+            <a
+              href="/mindchain _ecosystem_pitch_deck.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 hover:underline"
+            >
+              Mindchain Pitch Deck <ExternalLink className="w-3 h-3" />
             </a>
           </div>
 
