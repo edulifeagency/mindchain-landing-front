@@ -39,7 +39,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   const MIND_PRICE_USD = useLayoutStore(
     (state) => state.siteConfig?.mind.mind_price,
   );
-  const [usdInput, setUsdInput] = useState<string>("100");
+  const [usdInput, setUsdInput] = useState<string>("");
   const [couponCodeInput, setCouponCodeInput] = useState<string>("");
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
     null,
