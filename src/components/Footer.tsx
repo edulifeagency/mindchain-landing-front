@@ -233,7 +233,7 @@ export const Footer: React.FC = () => {
               Whitepaper <ExternalLink className="w-3 h-3" />
             </a>
             <a
-              href="/mindchain _ecosystem_pitch_deck.pdf"
+              href="/mindchain_ecosystem_pitch_deck.pdf"
               target="_blank"
               rel="noreferrer"
               className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 hover:underline"
