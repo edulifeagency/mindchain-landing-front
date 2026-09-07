@@ -151,7 +151,9 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
         data.invoice_id,
       );
     },
-    onError: () => {},
+    onError: () => {
+      // Ignore
+    },
   });
 
   return (
