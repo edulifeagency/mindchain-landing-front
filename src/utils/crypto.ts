@@ -5,7 +5,6 @@ import {
   ReferralRecord,
 } from "../types";
 
-export const MIND_PRICE_USD = 0.41;
 export const DEFAULT_DEPOSIT_ADDRESS =
   "0x8f3c7A91b61E2eB254FeB2dF31086C98A2cE748B";
 export const DEMO_USER_ADDRESS = "0x71C4B82390a42617C6418E66271c6f140689Af3d";

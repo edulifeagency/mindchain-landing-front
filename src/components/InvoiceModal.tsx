@@ -68,7 +68,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   // Initialize invoice on open
   useEffect(() => {
     if (isOpen && usdAmount > 0) {
-      const calc = calculateMindAmount(usdAmount);
+      const calc = calculateMindAmount(usdAmount, MIND_PRICE_USD);
       const originalUsd = usdAmount;
       let finalPayable = usdAmount;
       let activeCoupon = coupon ? { ...coupon } : null;

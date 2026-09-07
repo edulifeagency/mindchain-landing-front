@@ -268,7 +268,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
             <input
               type="text"
               readOnly
-              value={formatNumber(totalMind)}
+              value={formatNumber(totalMind || 0)}
               className="w-full bg-slate-950 border border-slate-700/80 rounded-xl py-3 px-4 text-cyan-300 font-mono text-lg sm:text-xl font-extrabold outline-none cursor-default"
             />
             <div className="absolute right-2.5 flex items-center gap-1 bg-cyan-950/60 border border-cyan-500/30 px-3 py-1 rounded-lg">
