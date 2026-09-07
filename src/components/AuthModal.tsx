@@ -229,7 +229,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div>
               <div className="flex justify-between items-center mb-1.5 px-1">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  MIND Wallet (Metamask/Trust Wallet)
+                  Wallet Address (
+                  <a
+                    href="https://mindwallet.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                  >
+                    MindWallet
+                  </a>
+                  / Metamask/Trust Wallet)
                 </label>
               </div>
 

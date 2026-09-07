@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { calculateMindAmount, formatNumber, formatUSD } from "../utils/crypto";
+import { formatNumber, formatUSD } from "../utils/crypto";
 import { AppliedCoupon } from "../types";
 import {
   ArrowDown,
@@ -30,6 +30,38 @@ interface PresaleCalculatorProps {
   onOpenAuth?: () => void;
 }
 
+function calculateMindAmount(
+  usdAmount: number,
+  mindPrice: number,
+): {
+  baseMind: number;
+  bonusPercent: number;
+  bonusMind: number;
+  totalMind: number;
+} {
+  const safeUsd = isNaN(usdAmount) || usdAmount < 0 ? 0 : usdAmount;
+  const baseMind = safeUsd / mindPrice;
+
+  let bonusPercent = 0;
+  if (safeUsd >= 5000) {
+    bonusPercent = 15;
+  } else if (safeUsd >= 1000) {
+    bonusPercent = 10;
+  } else if (safeUsd >= 500) {
+    bonusPercent = 5;
+  }
+
+  const bonusMind = (baseMind * bonusPercent) / 100;
+  const totalMind = baseMind + bonusMind;
+
+  return {
+    baseMind: Number(baseMind.toFixed(2)),
+    bonusPercent,
+    bonusMind: Number(bonusMind.toFixed(2)),
+    totalMind: Number(totalMind.toFixed(2)),
+  };
+}
+
 export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   onProceedToPay,
   className = "",
@@ -54,7 +86,7 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
   const maxUsd = purchaseSlots?.[purchaseSlots.length - 1]?.max_usd || 5000;
 
   const numericUsd = parseFloat(usdInput) || 0;
-  const { baseMind } = calculateMindAmount(numericUsd);
+  const { baseMind } = calculateMindAmount(numericUsd, Number(MIND_PRICE_USD));
 
   const currentSlot = purchaseSlots?.find(
     (s) => numericUsd >= s.min_usd && numericUsd <= s.max_usd,
