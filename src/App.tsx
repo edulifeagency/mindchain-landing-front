@@ -33,6 +33,7 @@ import { SiteConfig } from "./types/config";
 import { useLayoutStore } from "./store/useLayoutStore";
 import { User } from "./types/user";
 import Cookies from "js-cookie";
+import Loading from "./components/Loading";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -292,29 +293,12 @@ function AppContent() {
 }
 
 export default function App() {
-  const setSiteConfig = useLayoutStore((state) => state.setSiteConfig);
-  const setUser = useUserStore((state) => state.setUser);
+  const loadingConfig = useLayoutStore((state) => state.loading);
+  const loadingUser = useUserStore((state) => state.loading);
 
-  const { data: user } = useQuery<User>({
-    queryKey: ["profile"],
-    queryFn: () => api.get("/auth/profile").then((res) => res.data.data.user),
-    enabled: !!Cookies.get("accessToken"),
-  });
-
-  const { data: config } = useQuery<SiteConfig>({
-    queryKey: ["settings"],
-    queryFn: () => api.get("/settings").then((res) => res.data.data),
-  });
-
-  useEffect(() => {
-    if (config) {
-      setSiteConfig(config);
-    }
-
-    if (user) {
-      setUser(user);
-    }
-  }, [config, user, setSiteConfig, setUser]);
+  if (loadingConfig || loadingUser) {
+    return <Loading />;
+  }
 
   return (
     <BrowserRouter>
