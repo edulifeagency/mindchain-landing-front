@@ -273,7 +273,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
                       Coupon ({invoice.coupon.code}):
                     </span>
                     <span className="font-bold">
-                      -{formatUSD(invoice.coupon.discountPercent)}
+                      -{formatUSD(Number(invoice.coupon.discountAmountUSD))}
                     </span>
                   </div>
                 )}

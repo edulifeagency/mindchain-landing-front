@@ -673,7 +673,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <span className="text-sm">MIND</span>
                   </p>
                   <p className="text-[11px] text-emerald-400 font-mono mt-0.5">
-                    ≈ {formatUSD(totalRefMIND * MIND_PRICE_USD)} USD Value
+                    ≈ {formatUSD(totalRefMIND * MIND_PRICE_USD)} USDT Value
                   </p>
                 </div>
 
