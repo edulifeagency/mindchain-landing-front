@@ -78,7 +78,7 @@ export const PresalePage: React.FC<PresalePageProps> = ({
               Liquidity
             </span>
             <p className="text-2xl font-black text-amber-400 font-mono mt-1">
-              $600,000
+              Upcoming
             </p>
           </div>
 
