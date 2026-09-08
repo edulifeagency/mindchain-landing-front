@@ -222,7 +222,7 @@ export const Hero: React.FC<HeroProps> = ({
                 Public Sale
               </span>
               <span className="text-base sm:text-lg font-black text-white font-mono mt-1">
-                5 Million MIND
+                5,000,000
               </span>
             </div>
 

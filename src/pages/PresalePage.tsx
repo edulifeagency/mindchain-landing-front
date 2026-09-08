@@ -78,16 +78,16 @@ export const PresalePage: React.FC<PresalePageProps> = ({
               Liquidity
             </span>
             <p className="text-2xl font-black text-amber-400 font-mono mt-1">
-              Upcoming
+              $1,500,000
             </p>
           </div>
 
           <div className="bg-[#1e293b]/60 border border-slate-800 rounded-2xl p-4 text-center">
             <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider font-mono">
-              Public Lok
+              Public Token
             </span>
             <p className="text-2xl font-black text-white font-mono mt-1">
-              Upcoming
+              10M MIND
             </p>
           </div>
 
@@ -96,7 +96,7 @@ export const PresalePage: React.FC<PresalePageProps> = ({
               Tokenomics
             </span>
             <p className="text-2xl font-black text-white font-mono mt-1">
-              Upcoming
+              71M MIND
             </p>
           </div>
         </div>
