@@ -28,6 +28,7 @@ export const Hero: React.FC<HeroProps> = ({
   const purchaseSlots = useLayoutStore(
     (state) => state.siteConfig?.purchase.purchase_slots,
   );
+  const config = useLayoutStore((state) => state.siteConfig);
 
   const purchaseMutation = useMutation<
     Invoice,
@@ -197,76 +198,49 @@ export const Hero: React.FC<HeroProps> = ({
             MindChain Mainnet Live Network Telemetry
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
             <div className="bg-[#1e293b]/40 border border-slate-800/80 p-2.5 sm:p-3 rounded-xl flex flex-col justify-between">
               <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono">
-                Max Throughput
+                Current Price
               </span>
               <span className="text-base sm:text-lg font-black text-white font-mono mt-1">
-                65,000 TPS
-              </span>
-              <span className="text-[9px] sm:text-[10px] text-emerald-400 font-mono flex items-center gap-1 mt-0.5">
-                <Activity className="w-2.5 h-2.5 shrink-0" /> Benchmarked
+                ${config?.mind.mind_price}
               </span>
             </div>
 
             <div className="bg-[#1e293b]/40 border border-slate-800/80 p-2.5 sm:p-3 rounded-xl flex flex-col justify-between">
               <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono">
-                Total Blocks
+                Hard Cap
               </span>
               <span className="text-base sm:text-lg font-black text-cyan-400 font-mono mt-1">
-                18,429,102
-              </span>
-              <span className="text-[9px] sm:text-[10px] text-slate-400 font-mono mt-0.5">
-                Height #18.4M
+                $600,000
               </span>
             </div>
 
             <div className="bg-[#1e293b]/40 border border-slate-800/80 p-2.5 sm:p-3 rounded-xl flex flex-col justify-between">
               <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono">
-                Active Validators
+                Public Sale
               </span>
               <span className="text-base sm:text-lg font-black text-white font-mono mt-1">
-                164 Nodes
-              </span>
-              <span className="text-[9px] sm:text-[10px] text-emerald-400 font-mono mt-0.5">
-                99.99% Uptime
+                5 Million MIND
               </span>
             </div>
 
             <div className="bg-[#1e293b]/40 border border-slate-800/80 p-2.5 sm:p-3 rounded-xl flex flex-col justify-between">
               <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono">
-                Value Staked
+                Bonus Tier
               </span>
               <span className="text-base sm:text-lg font-black text-white font-mono mt-1">
-                $18.9M USD
-              </span>
-              <span className="text-[9px] sm:text-[10px] text-cyan-400 font-mono mt-0.5">
-                46.2M MIND
+                Max 3%
               </span>
             </div>
 
             <div className="bg-[#1e293b]/40 border border-slate-800/80 p-2.5 sm:p-3 rounded-xl flex flex-col justify-between">
               <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono">
-                Consensus
+                Payment Gateway
               </span>
               <span className="text-base sm:text-lg font-black text-emerald-400 font-mono mt-1">
-                PoS-BFT
-              </span>
-              <span className="text-[9px] sm:text-[10px] text-slate-400 font-mono mt-0.5">
-                Slashing enabled
-              </span>
-            </div>
-
-            <div className="bg-[#1e293b]/40 border border-slate-800/80 p-2.5 sm:p-3 rounded-xl flex flex-col justify-between">
-              <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono">
-                Security Audits
-              </span>
-              <span className="text-base sm:text-lg font-black text-white font-mono mt-1">
-                Passed (0 Vuln)
-              </span>
-              <span className="text-[9px] sm:text-[10px] text-emerald-400 font-mono mt-0.5">
-                CertiK & Hacken
+                BEP-20
               </span>
             </div>
           </div>
