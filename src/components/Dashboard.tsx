@@ -299,12 +299,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   // Referral link
-  const referralLink = `https://${window.location.host}/ref?id=${user?.referral_code}`;
+  const referralLink = `${window.location.origin}/ref?id=${encodeURIComponent(
+    user?.referral_code ?? "",
+  )}`;
 
   const handleCopyReferral = () => {
-    navigator.clipboard.writeText(user?.referral_code || "");
+    navigator.clipboard.writeText(referralLink || "");
     setCopiedRef(true);
-    onShowToast("Referral Link Copied", user?.referral_code, "success");
+    onShowToast("Referral Link Copied", referralLink, "success");
     setTimeout(() => setCopiedRef(false), 2000);
   };
 

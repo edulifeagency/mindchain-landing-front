@@ -34,6 +34,7 @@ import { useLayoutStore } from "./store/useLayoutStore";
 import { User } from "./types/user";
 import Cookies from "js-cookie";
 import Loading from "./components/Loading";
+import { ReferralPage } from "./pages/ReferralPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -182,6 +183,8 @@ function AppContent() {
             }
           />
           <Route path="/home" element={<Navigate to="/" replace />} />
+
+          <Route path="/ref" element={<ReferralPage />} />
 
           {/* Dedicated Presale Page */}
           <Route

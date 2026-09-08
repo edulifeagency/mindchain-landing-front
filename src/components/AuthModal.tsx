@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UserAccount } from "../types";
 import { isValidEVMAddress } from "../utils/crypto";
 import { Wallet, Eye, EyeOff, UserCheck, X, Loader2 } from "lucide-react";
@@ -26,6 +26,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [referralCode, setReferralCode] = useState<string>("");
   const [showPin, setShowPin] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      const params = new URLSearchParams(window.location.search);
+
+      if (window.location.pathname === "/ref") {
+        const code = params.get("id");
+
+        if (code) {
+          setReferralCode(code);
+        }
+      }
+    }
+  }, [isOpen]);
 
   // Mutations
   const loginMutation = useMutation<
