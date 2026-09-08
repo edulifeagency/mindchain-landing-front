@@ -54,55 +54,50 @@ export const PresalePage: React.FC<PresalePageProps> = ({
         </div>
 
         {/* Top Key Metrics Banner */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-[#1e293b]/60 border border-slate-800 rounded-2xl p-4 text-center">
             <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider font-mono">
-              Current Price
+              Trading Open date
             </span>
             <p className="text-2xl font-black text-emerald-400 font-mono mt-1">
-              ${MIND_PRICE_USD} USDT
+              Upcoming
             </p>
-            <span className="text-[10px] text-slate-500 font-mono">
-              Guaranteed Floor
-            </span>
           </div>
 
           <div className="bg-[#1e293b]/60 border border-slate-800 rounded-2xl p-4 text-center">
             <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider font-mono">
-              Total Raised
+              Trading live Price
             </span>
             <p className="text-2xl font-black text-cyan-400 font-mono mt-1">
-              $4,850,000
+              $0.15
             </p>
-            <span className="text-[10px] text-slate-500 font-mono">
-              Round 2 Target: $6.5M
-            </span>
           </div>
 
           <div className="bg-[#1e293b]/60 border border-slate-800 rounded-2xl p-4 text-center">
             <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider font-mono">
-              Max Bonus Tier
+              Liquidity
             </span>
             <p className="text-2xl font-black text-amber-400 font-mono mt-1">
-              +
-              {purchaseSlots?.[purchaseSlots.length - 1]?.bonus_percentage ?? 0}
-              % MIND
+              $600,000
             </p>
-            <span className="text-[10px] text-slate-500 font-mono">
-              On $1,000+ Deposits
-            </span>
           </div>
 
           <div className="bg-[#1e293b]/60 border border-slate-800 rounded-2xl p-4 text-center">
             <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider font-mono">
-              Payment Gateway
+              Public Lok
             </span>
             <p className="text-2xl font-black text-white font-mono mt-1">
-              USDT (BEP-20)
+              Upcoming
             </p>
-            <span className="text-[10px] text-emerald-400 font-mono">
-              Automated QR Verification
+          </div>
+
+          <div className="bg-[#1e293b]/60 border border-slate-800 rounded-2xl p-4 text-center">
+            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider font-mono">
+              Tokenomics
             </span>
+            <p className="text-2xl font-black text-white font-mono mt-1">
+              Upcoming
+            </p>
           </div>
         </div>
 
