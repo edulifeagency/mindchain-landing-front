@@ -161,8 +161,8 @@ export const PresalePage: React.FC<PresalePageProps> = ({
 
                   const depositLabel =
                     tier.max_usd >= 100000
-                      ? `$${tier.min_usd.toLocaleString()}+ Deposit`
-                      : `$${tier.min_usd.toLocaleString()} – $${tier.max_usd.toLocaleString()} Deposit`;
+                      ? `$${tier.min_usd.toLocaleString()}+ Purchase`
+                      : `$${tier.min_usd.toLocaleString()} – $${tier.max_usd.toLocaleString()} Purchase`;
 
                   return (
                     <div
