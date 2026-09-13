@@ -33,7 +33,7 @@ export const EcosystemPage: React.FC<EcosystemPageProps> = ({
           </p>
         </div>
 
-        {/* Grid Component */}
+        {/* Grid Component // */}
         <EcosystemGrid onSelectAction={() => onOpenBuyFlow(100, "")} />
 
         {/* Call to action card */}
