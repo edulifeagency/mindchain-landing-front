@@ -41,6 +41,7 @@ function AppContent() {
 
   // App state
   const user = useUserStore((state) => state.user);
+  const config = useLayoutStore((state) => state.siteConfig);
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
@@ -101,6 +102,14 @@ function AppContent() {
   useEffect(() => {
     localStorage.setItem("mindchain_txs", JSON.stringify(transactions));
   }, [transactions]);
+
+  useEffect(() => {
+    const favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+
+    if (favicon) {
+      favicon.href = config?.general.favicon || "/favicon.ico";
+    }
+  }, []);
 
   // Handlers
   const handleOpenAuth = (mode: "login" | "signup" = "login") => {

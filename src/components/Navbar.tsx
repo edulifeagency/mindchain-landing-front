@@ -34,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [copied, setCopied] = useState(false);
   const location = useLocation();
   const user = useUserStore((state) => state.user);
+  const config = useLayoutStore((state) => state.siteConfig);
 
   // Mutations
   const logoutMutation = useMutation({
@@ -65,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center cursor-pointer group shrink-0"
         >
           <img
-            src="/logo.png"
+            src={config?.general.logo || "/logo.png"}
             alt="MindChain"
             className="h-auto w-32 md:w-48 object-contain group-hover:scale-105 transition-transform duration-300"
           />
