@@ -414,7 +414,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <Wallet className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
+                <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight flex items-center gap-2">
+                  <img
+                    src="/mind.png"
+                    alt="MIND Coin"
+                    className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
+                  />
                   {formatNumber(Number(user?.mind_balance))}{" "}
                   <span className="text-cyan-400 text-sm">MIND</span>
                 </p>
@@ -460,7 +465,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <Users className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
+                <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight flex items-center gap-2">
+                  <img
+                    src="/mind.png"
+                    alt="MIND Coin"
+                    className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
+                  />
                   {formatNumber(Number(user?.referral_bonus.mind))}{" "}
                   <span className="text-amber-400 text-sm">MIND</span>
                 </p>

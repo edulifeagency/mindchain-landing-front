@@ -171,10 +171,17 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
               Official Bonus Rate
             </span>
           </div>
-          <h3 className="text-xl font-extrabold text-white mt-1">
-            Buy MIND Coin
-          </h3>
+
+          <div className="flex items-center gap-2 mt-1">
+            <img
+              src="/mind.png"
+              alt="MIND Coin"
+              className="w-7 h-7 object-contain"
+            />
+            <h3 className="text-xl font-extrabold text-white">Buy MIND Coin</h3>
+          </div>
         </div>
+
         <div className="text-right">
           <p className="text-[10px] uppercase font-mono text-slate-400">Rate</p>
           <p className="text-sm font-black text-cyan-400 font-mono">
