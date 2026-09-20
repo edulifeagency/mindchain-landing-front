@@ -95,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }
           >
             <Zap className="w-3.5 h-3.5 text-cyan-400" />
-            Presale
+            Public Sale
           </NavLink>
 
           <NavLink
