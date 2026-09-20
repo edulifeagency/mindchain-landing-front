@@ -1,6 +1,14 @@
 import React from "react";
 import { PresaleCalculator } from "./PresaleCalculator";
-import { Zap, ArrowRight, Activity, ArrowUpRight, Loader2 } from "lucide-react";
+import {
+  Zap,
+  ArrowRight,
+  Activity,
+  ArrowUpRight,
+  Loader2,
+  Coins,
+  Map,
+} from "lucide-react";
 
 import { AppliedCoupon } from "../types";
 import { useMutation } from "@tanstack/react-query";
@@ -102,46 +110,69 @@ export const Hero: React.FC<HeroProps> = ({
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-1 sm:pt-2">
-              <button
-                onClick={() => {
-                  if (isLoggedIn && !purchaseMutation.isPending) {
-                    purchaseMutation.mutate(100);
-                  }
+            <div className="flex flex-col gap-3 sm:gap-4 pt-1 sm:pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4">
+                <button
+                  onClick={() => {
+                    if (isLoggedIn && !purchaseMutation.isPending) {
+                      purchaseMutation.mutate(100);
+                    }
 
-                  if (!isLoggedIn) {
-                    onOpenAuth?.();
-                  }
-                }}
-                disabled={purchaseMutation.isPending}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs sm:text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer min-h-12 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                {purchaseMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin shrink-0" />
-                ) : (
-                  <Zap className="w-4 h-4 fill-slate-950 shrink-0" />
-                )}
+                    if (!isLoggedIn) {
+                      onOpenAuth?.();
+                    }
+                  }}
+                  disabled={purchaseMutation.isPending}
+                  className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-linear-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black rounded-xl uppercase tracking-widest text-xs sm:text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer min-h-12 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  {purchaseMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                  ) : (
+                    <Zap className="w-4 h-4 fill-slate-950 shrink-0" />
+                  )}
 
-                <span>
-                  {purchaseMutation.isPending
-                    ? "Processing..."
-                    : isLoggedIn
-                      ? "Buy with Bonus (USDT BEP-20)"
-                      : "Login & Buy with Bonus"}
-                </span>
-              </button>
+                  <span>
+                    {purchaseMutation.isPending
+                      ? "Processing..."
+                      : isLoggedIn
+                        ? "Buy with Bonus (USDT BEP-20)"
+                        : "Login & Buy with Bonus"}
+                  </span>
+                </button>
 
-              <a
-                href="https://mindchain.info"
-                target="_blank"
-                rel="noreferrer"
-                className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-bold rounded-xl border border-slate-700 hover:border-slate-600 transition-all flex items-center justify-center gap-2 cursor-pointer text-center text-xs sm:text-sm min-h-12"
-              >
-                <span>Visit mindchain.info</span>
-                <ArrowUpRight className="w-4 h-4 text-cyan-400 shrink-0" />
-              </a>
+                <a
+                  href="https://mindchain.info"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-bold rounded-xl border border-slate-700 hover:border-slate-600 transition-all flex items-center justify-center gap-2 cursor-pointer text-center text-xs sm:text-sm min-h-12"
+                >
+                  <span>Visit mindchain.info</span>
+                  <ArrowUpRight className="w-4 h-4 text-cyan-400 shrink-0" />
+                </a>
+              </div>
+
+              <div className="flex items-center justify-center lg:justify-start gap-6 sm:gap-8 px-1 pt-1">
+                <a
+                  href="/mindchain_tokenomics.pdf"
+                  target="_blank"
+                  className="group inline-flex items-center gap-1.5 text-sm font-bold text-cyan-300/80 hover:text-cyan-300 transition-colors"
+                >
+                  <Coins className="w-4 h-4 shrink-0" />
+                  <span>Tokenomics</span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                </a>
+
+                <a
+                  href="/mindchain_roadmap.pdf"
+                  target="_blank"
+                  className="group inline-flex items-center gap-1.5 text-sm font-bold text-emerald-300/80 hover:text-emerald-300 transition-colors"
+                >
+                  <Map className="w-4 h-4 shrink-0" />
+                  <span>Roadmap</span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                </a>
+              </div>
             </div>
-
             {/* Quick Proof Points */}
             <div className="pt-3 sm:pt-4 grid grid-cols-3 gap-2 sm:gap-3 border-t border-slate-800/80 max-w-lg mx-auto lg:mx-0">
               <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-slate-800 text-left">
