@@ -36,7 +36,7 @@ export const PresalePage: React.FC<PresalePageProps> = ({
             OFFICIAL MINDCHAIN ECOSYSTEM PRESALE ROUND
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-            Presale Terminal &{" "}
+            Public Sale Terminal &{" "}
             <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
               Bonus Allocation
             </span>
