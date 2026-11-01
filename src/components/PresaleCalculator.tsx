@@ -17,6 +17,7 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../lib/api";
 import { AxiosError } from "axios";
 import { Invoice } from "../types/invoice";
+import TagManager from "react-gtm-module";
 
 interface PresaleCalculatorProps {
   onProceedToPay: (
@@ -99,6 +100,26 @@ export const PresaleCalculator: React.FC<PresaleCalculatorProps> = ({
       onOpenAuth?.();
       return;
     }
+
+    // Send event
+    TagManager.dataLayer({
+      dataLayer: {
+        event: "begin_checkout",
+        currency: "USD",
+        value: payableUsd,
+        items: [
+          {
+            item_id: "MIND",
+            item_name: "MIND Coin",
+            item_category: "Cryptocurrency",
+            price: Number(MIND_PRICE_USD),
+            quantity: Number((totalMind / Number(MIND_PRICE_USD)).toFixed(8)),
+          },
+        ],
+        coupon: appliedCoupon?.code || undefined,
+      },
+    });
+
     purchaseMutation.mutate();
   };
 
