@@ -11,6 +11,7 @@ import QRCode from "react-qr-code";
 import { useLayoutStore } from "../store/useLayoutStore";
 import { useQuery } from "@tanstack/react-query";
 import api from "../lib/api";
+import TagManager from "react-gtm-module";
 
 interface InvoiceModalProps {
   isOpen: boolean;
@@ -32,7 +33,9 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 }) => {
   const [invoice, setInvoice] = useState<PaymentInvoice | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
-  const [timeLeft, setTimeLeft] = useState<number>(1200); // 15 mins
+  const [timeLeft, setTimeLeft] = useState<number>(1200);
+  const purchaseTrackedRef = useRef<string | null>(null);
+
   const MIND_PRICE_USD =
     useLayoutStore((state) => state.siteConfig?.mind.mind_price) || 1;
   const purchaseSlots = useLayoutStore(
@@ -119,12 +122,37 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
     return () => clearInterval(interval);
   }, [isOpen]);
 
-  // Close modal on success
+  // Track purchase and close modal on successful payment
   useEffect(() => {
-    if (paymentResponse?.payment_status === "completed") {
+    if (paymentResponse?.payment_status === "completed" && invoice) {
+      if (invoiceId && purchaseTrackedRef.current !== invoiceId) {
+        TagManager.dataLayer({
+          dataLayer: {
+            event: "purchase",
+            ecommerce: {
+              transaction_id: invoiceId,
+              value: invoice.usdAmount,
+              currency: "USD",
+              coupon: invoice.coupon?.code || undefined,
+              items: [
+                {
+                  item_id: "MIND",
+                  item_name: "MIND Coin",
+                  item_category: "Cryptocurrency",
+                  price: invoice.usdAmount,
+                  quantity: 1,
+                },
+              ],
+            },
+          },
+        });
+
+        purchaseTrackedRef.current = invoiceId;
+      }
+
       onClose();
     }
-  }, [paymentResponse]);
+  }, [paymentResponse, invoice, invoiceId, onClose]);
 
   const handleCopyAddress = () => {
     if (invoice?.depositAddress) {
